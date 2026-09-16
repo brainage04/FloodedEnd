@@ -25,5 +25,10 @@ public final class FloodedEndNeoForgeGameTestRegistration {
 				FloodedEnd.of("flood_readback_command_is_registered"),
 				() -> tests::floodReadbackCommandIsRegistered
 		);
+		event.register(
+				BuiltInRegistries.TEST_FUNCTION.key(),
+				FloodedEnd.of("end_city_is_flooded_ends"),
+				() -> tests::endCityIsFloodedEnds
+		);
 	}
 }

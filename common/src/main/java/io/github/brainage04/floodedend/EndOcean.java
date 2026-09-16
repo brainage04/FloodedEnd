@@ -21,7 +21,14 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
 	public static final int SURFACE_BELOW_SEA_LEVEL = 1;
 
 	public static EndOcean of(ServerLevel level) {
-		ChunkGenerator generator = level.getChunkSource().getGenerator();
+		return of(level.getChunkSource().getGenerator());
+	}
+
+	/**
+	 * The ocean a chunk generator was built with. World generation asks this before any level exists, which is how
+	 * the structure that moors the End ships learns the waterline of the world it is generating into.
+	 */
+	public static EndOcean of(ChunkGenerator generator) {
 		if (generator instanceof NoiseBasedChunkGenerator noise) {
 			NoiseGeneratorSettings settings = noise.generatorSettings().value();
 			return new EndOcean(settings.seaLevel(), settings.defaultFluid(), settings.isAquifersEnabled());

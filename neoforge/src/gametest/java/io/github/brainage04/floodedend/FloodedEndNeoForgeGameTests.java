@@ -10,4 +10,8 @@ public final class FloodedEndNeoForgeGameTests {
 	public void floodReadbackCommandIsRegistered(GameTestHelper helper) {
 		FloodedEndAssertions.assertCommandIsRegistered(helper);
 	}
+
+	public void endCityIsFloodedEnds(GameTestHelper helper) {
+		FloodedEndAssertions.assertEndCityIsFloodedEnds(helper);
+	}
 }

@@ -13,4 +13,9 @@ public final class FloodedEndGameTest {
 	public void floodReadbackCommandIsRegistered(GameTestHelper helper) {
 		FloodedEndAssertions.assertCommandIsRegistered(helper);
 	}
+
+	@GameTest
+	public void endCityIsFloodedEnds(GameTestHelper helper) {
+		FloodedEndAssertions.assertEndCityIsFloodedEnds(helper);
+	}
 }
