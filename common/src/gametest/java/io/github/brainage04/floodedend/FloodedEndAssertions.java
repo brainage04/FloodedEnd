@@ -2,6 +2,7 @@ package io.github.brainage04.floodedend;
 
 import io.github.brainage04.floodedend.command.FloodedEndCommand;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
@@ -9,8 +10,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
-/** Loader-independent assertions for the contracts the mod ships: a flooded End, its End cities, and its readback command. */
+/**
+ * Loader-independent assertions for the contracts the mod ships: a flooded End, its End cities and their moored
+ * ships, and its readback command.
+ */
 public final class FloodedEndAssertions {
 	private FloodedEndAssertions() {
 	}
@@ -66,4 +71,22 @@ public final class FloodedEndAssertions {
 		);
 		helper.succeed();
 	}
+
+	/**
+	 * The mooring code finds the End ship by template id alone, so a template that does not resolve would leave
+	 * every ship in the sky without an error anywhere.
+	 */
+	public static void assertEndShipTemplateResolves(GameTestHelper helper) {
+		StructureTemplate ship = helper.getLevel()
+				.getServer()
+				.getStructureManager()
+				.getOrCreate(Identifier.withDefaultNamespace("end_city/ship"));
+		Vec3i size = ship.getSize();
+		helper.assertTrue(
+				size.getX() > 0 && size.getY() > 0 && size.getZ() > 0,
+				"the End ship template minecraft:end_city/ship must resolve to a real template but is " + size
+		);
+		helper.succeed();
+	}
+
 }

@@ -17,15 +17,21 @@ import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
 /**
  * The End city as it generates in the flooded End.
  *
- * <p>Vanilla builds the city from the same templates this class uses, so the city is left exactly as vanilla
- * generates it. One thing changes once the End has an ocean: <b>placement ignores the water</b>. Vanilla asks the
- * world surface heightmap where the ground is, and with an ocean that heightmap answers with the water surface
- * instead. A city whose five-by-five sample box touches flooded ground is then rejected, so the flooded End would
- * silently lose cities. Asking the ocean floor heightmap instead gives the answer vanilla gets on a dry End, which
- * keeps the same cities for the same seed.</p>
+ * <p>Vanilla builds the city and its ship from the same templates this class uses, so the city is left exactly as
+ * vanilla generates it. Two things change once the End has an ocean:</p>
  *
- * <p>The sea level and the fluid are read back out of the running chunk generator, so a dry End keeps vanilla's
- * placement exactly.</p>
+ * <ul>
+ *     <li><b>Placement ignores the water.</b> Vanilla asks the world surface heightmap where the ground is, and
+ *     with an ocean that heightmap answers with the water surface instead. A city whose five-by-five sample box
+ *     touches flooded ground is then rejected, so the flooded End would silently lose cities. Asking the ocean
+ *     floor heightmap instead gives the answer vanilla gets on a dry End, which keeps the same cities for the same
+ *     seed.</li>
+ *     <li><b>Its ship is moored</b> by {@link EndShipMooring}, which lowers the hull from the top of the city's
+ *     tower onto the sea.</li>
+ * </ul>
+ *
+ * <p>The sea level and the fluid are read back out of the running chunk generator, so a world using a different
+ * waterline moors its ships at that world's waterline, and a dry End keeps vanilla's placement of both.</p>
  */
 public final class EndCityAtSea extends Structure {
 	public static final String NAME = "end_city";
@@ -98,6 +104,10 @@ public final class EndCityAtSea extends Structure {
 	) {
 		List<StructurePiece> pieces = Lists.newArrayList();
 		EndCityPieces.startHouseTower(context.structureTemplateManager(), origin, rotation, pieces, context.random());
+		if (ocean.flooded()) {
+			EndShipMooring.moor(context, pieces, ocean);
+		}
+
 		pieces.forEach(builder::addPiece);
 	}
 

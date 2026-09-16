@@ -18,4 +18,10 @@ public final class FloodedEndGameTest {
 	public void endCityIsFloodedEnds(GameTestHelper helper) {
 		FloodedEndAssertions.assertEndCityIsFloodedEnds(helper);
 	}
+
+	@GameTest
+	public void endShipTemplateResolves(GameTestHelper helper) {
+		FloodedEndAssertions.assertEndShipTemplateResolves(helper);
+	}
+
 }

@@ -14,4 +14,9 @@ public final class FloodedEndNeoForgeGameTests {
 	public void endCityIsFloodedEnds(GameTestHelper helper) {
 		FloodedEndAssertions.assertEndCityIsFloodedEnds(helper);
 	}
+
+	public void endShipTemplateResolves(GameTestHelper helper) {
+		FloodedEndAssertions.assertEndShipTemplateResolves(helper);
+	}
+
 }

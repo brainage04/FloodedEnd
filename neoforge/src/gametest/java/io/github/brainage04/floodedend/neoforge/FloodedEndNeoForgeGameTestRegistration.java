@@ -30,5 +30,10 @@ public final class FloodedEndNeoForgeGameTestRegistration {
 				FloodedEnd.of("end_city_is_flooded_ends"),
 				() -> tests::endCityIsFloodedEnds
 		);
+		event.register(
+				BuiltInRegistries.TEST_FUNCTION.key(),
+				FloodedEnd.of("end_ship_template_resolves"),
+				() -> tests::endShipTemplateResolves
+		);
 	}
 }
