@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "${mod_id}",
+	"version": "${mod_version}",
+	"name": "${mod_name}",
+	"description": "Restores the End's ocean: the dimension generates with water as its default fluid and a global End sea, so its basins, hollows and the void between the islands flood and the islands rise out of open water.",
+	"authors": [
+		"brainage04"
+	],
+	"contact": {
+		"homepage": "https://github.com/brainage04/FloodedEnd",
+		"sources": "https://github.com/brainage04/FloodedEnd"
+	},
+	"license": "MIT",
+	"icon": "assets/floodedend/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.brainage04.floodedend.fabric.FloodedEndFabric"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=${java_version}",
+		"fabric-api": "*"
+	}
+}
