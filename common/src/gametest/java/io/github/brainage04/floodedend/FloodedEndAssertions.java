@@ -1,12 +1,22 @@
 package io.github.brainage04.floodedend;
 
 import io.github.brainage04.floodedend.command.FloodedEndCommand;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -14,7 +24,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 /**
  * Loader-independent assertions for the contracts the mod ships: a flooded End, its End cities and their moored
- * ships, and its readback command.
+ * ships, its readback command, and the sea-level presets.
  */
 public final class FloodedEndAssertions {
 	private FloodedEndAssertions() {
@@ -89,4 +99,45 @@ public final class FloodedEndAssertions {
 		helper.succeed();
 	}
 
+	/**
+	 * A preset must install the world's End ocean as a data pack the game itself can read back at the requested
+	 * waterline, and clearing it must leave the world on the shipped ocean again.
+	 */
+	public static void assertPresetInstallsAnOcean(GameTestHelper helper) {
+		MinecraftServer server = helper.getLevel().getServer();
+		EndOceanPreset preset = EndOceanPreset.DROWNED;
+		try {
+			preset.install(server);
+			helper.assertTrue(
+					EndOceanPreset.installed(server),
+					"installing " + preset.id() + " must leave " + EndOceanPreset.DIRECTORY + " in the world's data packs"
+			);
+
+			Path ocean = EndOceanPreset.directory(server).resolve("data/minecraft/worldgen/noise_settings/end.json");
+			RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, helper.getLevel().registryAccess());
+			NoiseGeneratorSettings settings = NoiseGeneratorSettings.CODEC
+					.parse(ops, JsonParser.parseString(Files.readString(ocean, StandardCharsets.UTF_8)))
+					.getOrThrow(error -> new AssertionError("the installed End ocean must be valid noise settings: " + error))
+					.value();
+			helper.assertTrue(
+					settings.seaLevel() == preset.seaLevel(),
+					"the installed ocean must have " + preset.id() + "'s sea level " + preset.seaLevel()
+							+ " but has " + settings.seaLevel()
+			);
+			helper.assertTrue(
+					settings.defaultFluid().is(Blocks.WATER),
+					"a preset must still flood the End with water but writes " + settings.defaultFluid()
+			);
+
+			EndOceanPreset.remove(server);
+			helper.assertTrue(
+					!EndOceanPreset.installed(server),
+					"clearing the preset must remove it from the world's data packs"
+			);
+		} catch (IOException error) {
+			throw new AssertionError("the preset could not be installed or cleared", error);
+		}
+
+		helper.succeed();
+	}
 }

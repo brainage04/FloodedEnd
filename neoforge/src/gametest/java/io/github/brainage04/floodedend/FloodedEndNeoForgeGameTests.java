@@ -19,4 +19,7 @@ public final class FloodedEndNeoForgeGameTests {
 		FloodedEndAssertions.assertEndShipTemplateResolves(helper);
 	}
 
+	public void presetInstallsAnOcean(GameTestHelper helper) {
+		FloodedEndAssertions.assertPresetInstallsAnOcean(helper);
+	}
 }

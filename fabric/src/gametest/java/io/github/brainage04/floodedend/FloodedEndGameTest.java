@@ -24,4 +24,8 @@ public final class FloodedEndGameTest {
 		FloodedEndAssertions.assertEndShipTemplateResolves(helper);
 	}
 
+	@GameTest
+	public void presetInstallsAnOcean(GameTestHelper helper) {
+		FloodedEndAssertions.assertPresetInstallsAnOcean(helper);
+	}
 }

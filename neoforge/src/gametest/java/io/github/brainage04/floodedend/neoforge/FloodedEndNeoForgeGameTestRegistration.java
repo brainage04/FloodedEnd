@@ -35,5 +35,10 @@ public final class FloodedEndNeoForgeGameTestRegistration {
 				FloodedEnd.of("end_ship_template_resolves"),
 				() -> tests::endShipTemplateResolves
 		);
+		event.register(
+				BuiltInRegistries.TEST_FUNCTION.key(),
+				FloodedEnd.of("preset_installs_an_ocean"),
+				() -> tests::presetInstallsAnOcean
+		);
 	}
 }
