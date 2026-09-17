@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -24,7 +26,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  * city as the sea allows.</p>
  *
  * <p>Nothing else about the city is touched: the towers, the bridges that used to lead to each ship and the rest of
- * the structure keep vanilla's placement.</p>
+ * the structure keep vanilla's placement. A ship is never moved outside the structure's own reference radius, because
+ * a chunk only places the pieces of a start within {@link ChunkStatus#MAX_STRUCTURE_DISTANCE} chunks of it.</p>
  */
 public final class EndShipMooring {
 	/** The ship template is the only End city piece that puts a hull in the world. */
@@ -78,12 +81,38 @@ public final class EndShipMooring {
 	}
 
 	/**
+	 * Where a moved ship may end up. A chunk only places the pieces of a structure start within
+	 * {@link ChunkStatus#MAX_STRUCTURE_DISTANCE} chunks of it, so a ship pushed further than that would be placed
+	 * only as far as the radius reaches and would stand in the world half built.
+	 */
+	private static BoundingBox placeableArea(Structure.GenerationContext context) {
+		ChunkPos chunk = context.chunkPos();
+		int x = chunk.getMinBlockX();
+		int z = chunk.getMinBlockZ();
+		int distance = ChunkStatus.MAX_STRUCTURE_DISTANCE * 16;
+		return new BoundingBox(
+				x - distance,
+				context.heightAccessor().getMinY(),
+				z - distance,
+				x + 15 + distance,
+				context.heightAccessor().getMaxY(),
+				z + 15 + distance
+		);
+	}
+
+	private static boolean inside(BoundingBox area, BoundingBox box) {
+		return box.minX() >= area.minX() && box.maxX() <= area.maxX()
+				&& box.minZ() >= area.minZ() && box.maxZ() <= area.maxZ();
+	}
+
+	/**
 	 * The nearest column whose seabed leaves the whole hull clear of ground, searched outwards from where vanilla
 	 * puts the ship, so a ship stays as close to its city as the sea allows.
 	 */
 	private static Optional<BlockPos> findMooring(Structure.GenerationContext context, StructurePiece ship, int keelY) {
 		BlockPos origin = ((TemplateStructurePiece) ship).templatePosition();
 		BoundingBox hull = ship.getBoundingBox();
+		BoundingBox area = placeableArea(context);
 		Map<Long, Integer> seabed = new HashMap<>();
 		for (int reach = 0; reach <= MOORING_REACH; reach += MOORING_STEP) {
 			for (int dz = -reach; dz <= reach; dz += MOORING_STEP) {
@@ -92,7 +121,8 @@ public final class EndShipMooring {
 						continue;
 					}
 
-					if (floats(context, seabed, hull.moved(dx, 0, dz), keelY)) {
+					BoundingBox moved = hull.moved(dx, 0, dz);
+					if (inside(area, moved) && floats(context, seabed, moved, keelY)) {
 						return Optional.of(origin.offset(dx, keelY - origin.getY(), dz));
 					}
 				}
