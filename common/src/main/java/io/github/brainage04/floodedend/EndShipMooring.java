@@ -34,8 +34,12 @@ public final class EndShipMooring {
 	private static final Identifier SHIP_TEMPLATE = Identifier.withDefaultNamespace("end_city/ship");
 	/** How deep the hull sits in the water, counted from the keel up to the water surface. */
 	public static final int SHIP_DRAFT = 3;
-	/** A ship may be moved this far from where vanilla puts it, to find water deep enough to float in. */
-	private static final int MOORING_REACH = 128;
+	/**
+	 * A ship may be moved this far from where vanilla puts it, to find water deep enough to float in. Measured
+	 * moorings need 1 to 14 blocks, so this is generous; keeping it small also keeps a moored ship inside the
+	 * neighbourhood its city's structure was saved with.
+	 */
+	private static final int MOORING_REACH = 48;
 	/** Mooring search and seabed sampling resolution; the seabed is sampled on this block grid. */
 	private static final int MOORING_STEP = 8;
 	/** Blocks of water left between the seabed and the keel, so no hull ever meets ground. */
