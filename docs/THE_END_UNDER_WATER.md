@@ -83,6 +83,28 @@ up, which is comfortably inside one breath.
 The fight still runs at either waterline: the dragon flies, the crystals heal at the vanilla rate, the pillars still
 perch and the portal still activates and works. What the drowned preset changes is the arena floor.
 
+## Where a ship may moor
+
+Mooring moves a structure piece, and two limits come with that. Both were found by measuring generated worlds rather
+than by reasoning about them.
+
+**A ship has to stay inside the structure's reference radius.** A chunk only places the pieces of a structure start
+that is at most `ChunkStatus.MAX_STRUCTURE_DISTANCE` (8) chunks away from the chunk that created it. The first
+version of the mooring searched 128 blocks and produced a ship whose hull reached a ninth chunk away: the far third of
+it was never placed, and it stood in the sea half built. The search now rejects any position whose hull box leaves the
+placement chunk's eight-chunk neighbourhood.
+
+**A ship has to stay in its city's own neighbourhood.** The reach is 48 blocks, which is far more than the mooring
+ever needs — the ships of a watched world moved between 1 and 14 blocks to find water — and it keeps a moored ship
+close to the city it belongs to.
+
+One generated world still shows a residue of the earlier, wider search: a 174-block bow of an End ship stands at
+(-1728, 54, 45) with no matching structure start in the save, while the same city's complete ship is a hundred blocks
+away. The fragment is unchanged by the reach (identical at 48 and 128 blocks) and by a regeneration in which each
+city's structure start chunk was generated before its neighbours, so it is not the mooring alone; the End cities the
+delivered captures were shot around all carry complete 929-block ships.
+
+
 ## Not in this release
 
 **Submerged flora.** The measurement is against it for now. Of the 2662222 water columns in the delivered world,
