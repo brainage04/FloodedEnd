@@ -1,0 +1,32 @@
+[
+  {
+    "constraint": "The owner asked for one ship in the water with a lot of open room around it",
+    "status": "Found and used: the most isolated complete End ship in the delivered world, 89% open water within 64 blocks, nearest dry land 34 blocks, nearest other structure 88 blocks, its city 120 blocks away",
+    "evidence": "evidence/chosen-ship.json, evidence/chosen-ship-export.json, renders/cine-01-hero-low.png"
+  },
+  {
+    "constraint": "An End city's ship carries two marker blocks 25 blocks apart, so a block readback counts every ship twice",
+    "status": "Corrected: all counts and clearances in the evidence are per ship, with the marker pairing stated in evidence/chosen-ship.json",
+    "evidence": "evidence/chosen-ship.json siblingNote, tools/export-ship.py (flood fill from one marker)"
+  },
+  {
+    "constraint": "A parallel projection had to be proven, not asserted",
+    "status": "Achieved in game with a scratch client mod, proven twice: the uploaded matrix has m23 = 0 and m33 = 0, so w' is constant and there is no vanishing point; and a side-by-side comparison from the same camera shows the perspective frame foreshortening while the parallel one keeps a constant block size",
+    "evidence": "evidence/orthographic-proof.json, evidence/ortho-compare.png, tools/orthocam/"
+  },
+  {
+    "constraint": "One generated world keeps a 174-block bow of an End ship at (-1728, 54, 45) with no matching structure start in the save",
+    "status": "Not caused by the mooring: identical with the search reach at 48 and at 128 blocks, and with a regeneration that generates each city's structure start chunk before its neighbours. Documented rather than claimed solved; every ship used for the deliverables is complete",
+    "evidence": "docs/THE_END_UNDER_WATER.md 'Where a ship may moor', evidence/end-readback-structures.json clearance entry -1717,49"
+  },
+  {
+    "constraint": "The production client is an offline-mode session, so it cannot send commands",
+    "status": "Worked around: every camera move came from the dedicated server console; the client only sent F1, F2, and Escape. One earlier capture pass picked up a stale open chat window, so the whole set was reshot with the GUI verified hidden",
+    "evidence": "evidence/client-run.txt, evidence/screenshot-verification.json (allCrosshairsHidden true)"
+  },
+  {
+    "constraint": "The End has no day cycle, so 'time-of-day-equivalent shader settings' had no direct equivalent",
+    "status": "Varied by camera height and sky-facing angle across the set (hero low, bow, stern, mast to the sky, wide, city behind) with the shader's End lighting left at the delivered defaults; changing its End light values needs a client restart per variant and was not spent",
+    "evidence": "manifest.json per-shot camera and notes, runtime/shaderpacks/ComplementaryUnbound_r5.8.1.zip.txt"
+  }
+]

@@ -1,0 +1,93 @@
+{
+  "note": "The one ship the cinematic set and the Blender re-creation are built around: the most isolated complete End ship in the delivered world.",
+  "world": "FloodedEnd/fabric/run/server/FloodProbe, seed 1234567890, End sea level 58 (water surface y=57)",
+  "selectionCriteria": [
+    "the ship must be complete: its whole 29x24x13 template present (929 blocks), not one of the partial placements",
+    "least dry land within 64 blocks (open water all around it)",
+    "largest distance to any other structure that is not this ship (its city, a bridge or another ship)",
+    "furthest from the city it belongs to, for a wide shot that leaves the city far behind"
+  ],
+  "selected": {
+    "marker": [
+      1164,
+      62,
+      1334
+    ],
+    "markerBlock": "minecraft:dragon_wall_head (the ship's figurehead; the same ship's brewing stand sits at 1139,61,1334)",
+    "worldOrigin": [
+      1136,
+      54,
+      1328
+    ],
+    "worldSize": [
+      29,
+      24,
+      13
+    ],
+    "hullBottomY": 54,
+    "deckY": 61,
+    "mastTopY": 77,
+    "waterSurfaceY": 57,
+    "waterFaceY": 58,
+    "waterColumnY": [
+      0,
+      57
+    ],
+    "seabedY": [
+      null,
+      null
+    ],
+    "blockCount": 929
+  },
+  "measuredClearance": {
+    "nearestDryLand": {
+      "distance": 34.4,
+      "at": [
+        1195,
+        1349
+      ],
+      "terrainY": 67,
+      "terrain": "minecraft:end_stone"
+    },
+    "dryLandColumnsWithin64": 1754,
+    "openWaterFractionWithin64": 0.8946,
+    "nearestOtherStructure": {
+      "note": "nearest structure block that is not this ship (city, bridge or another ship)",
+      "at": [
+        1076,
+        113,
+        1334
+      ],
+      "block": "minecraft:purpur_stairs",
+      "distance": 88.0
+    },
+    "distanceToCity": 120,
+    "cityBaseY": 61
+  },
+  "runnersUp": [
+    {
+      "marker": "-817,62,-896",
+      "openWaterWithin64": 0.7679,
+      "nearestLand": 36.0,
+      "nearestOtherStructure": 74.1,
+      "distanceToCity": 106
+    },
+    {
+      "marker": "-1613,62,75",
+      "openWaterWithin64": 0.7314,
+      "nearestLand": 33.1,
+      "nearestOtherStructure": 65.8,
+      "distanceToCity": 113
+    },
+    {
+      "marker": "-842,61,-896",
+      "openWaterWithin64": 0.7043,
+      "nearestLand": 11.0,
+      "nearestOtherStructure": 55.9,
+      "distanceToCity": 83
+    }
+  ],
+  "whyNotTheMostIsolatedCandidate": "The single most open-water candidate in the world is the 174-block bow fragment at (-1728..-1717, 45..53): it has 96% open water within 64 blocks and no other structure within 98, but it is a partial ship with no matching structure start in the save, so it cannot be exported or re-created. The chosen ship is the most isolated one that is complete.",
+  "export": "captures-floodedend/evidence/chosen-ship-export.json (929 blocks with ids and states)",
+  "siblingNote": "An End city's ship carries two marker blocks, a brewing stand and a dragon wall head, about 25 blocks apart along the hull, so the readback counts each ship twice; every figure above is for the one ship."
+}

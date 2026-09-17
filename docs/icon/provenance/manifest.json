@@ -1,0 +1,98 @@
+[
+ {
+  "project": "FloodedEnd",
+  "label": "Cinematic: End ship at the waterline, low hero angle",
+  "path": "captures-floodedend/renders/cine-01-hero-low.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.03.32.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. Camera one and a half blocks above the water, 20 blocks off the beam, the whole hull and its reflection in frame. Camera x=1150 y=59 z=1314 yaw=0.0 pitch=1.43, aimed with /execute in minecraft:the_end run tp IconCapture 1150 59 1314 facing 1150 58.5 1334; FOV 70 vertical, seed 1234567890. sha256 c6cb57d2f0d5a0612252a317bbb3cb434df88b100f8de4e23ca870705fddce96."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Cinematic: End ship bow on",
+  "path": "captures-floodedend/renders/cine-02-bow-on.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.03.59.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. Astern of the figurehead looking down the length of the ship, open water each side and the mast square in frame. Camera x=1186 y=61 z=1334 yaw=90.0 pitch=1.59, aimed with /execute in minecraft:the_end run tp IconCapture 1186 61 1334 facing 1150 60 1334; FOV 70 vertical, seed 1234567890. sha256 e471ca067ef62d8d2fed9caa66e0cd69da3a3f4e9bbefe1b2e90598bdcdf23e5."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Cinematic: End ship stern on",
+  "path": "captures-floodedend/renders/cine-03-stern-on.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.04.24.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. From off the stern, the ship small against open water with the island shelf low at the right edge. Camera x=1114 y=61 z=1334 yaw=270.0 pitch=-0.0, aimed with /execute in minecraft:the_end run tp IconCapture 1114 61 1334 facing 1152 61 1334; FOV 70 vertical, seed 1234567890. sha256 a21c9ee9d9e24b7c7559b69e387404634687a6781d8d7e31c68be76e7667d062."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Cinematic: mast crossing the sky",
+  "path": "captures-floodedend/renders/cine-04-mast-sky.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.04.49.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. Close under the mast looking up: deck, mast and yard against the End sky, water out of frame. Camera x=1156 y=57 z=1324 yaw=0.0 pitch=-70.82, aimed with /execute in minecraft:the_end run tp IconCapture 1156 57 1324 facing 1156 80 1332; FOV 70 vertical, seed 1234567890. sha256 a59e2f82ef18dd1b11ec4eb36aee02c32d0033568c88d3795358e634eea6c9c5."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Cinematic: establishing shot, ship small in the ocean",
+  "path": "captures-floodedend/renders/cine-05-wide-ocean.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.05.15.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. A hundred and twenty blocks back and twenty-one above the water: the ship small, the ocean and the outer islands carrying the frame. Camera x=1150 y=78 z=1246 yaw=0.0 pitch=11.56, aimed with /execute in minecraft:the_end run tp IconCapture 1150 78 1246 facing 1150 60 1334; FOV 70 vertical, seed 1234567890. sha256 0322aad5d9e3f090ab8a1a5b1d3e690a5a7ba4e70412f481b2170063d03a3639."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Cinematic: the ship with the city it belongs to far behind",
+  "path": "captures-floodedend/renders/cine-06-city-behind.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.05.39.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. From beyond the bow looking back west: the ship in the mid-ground and its city 120 blocks beyond it. Camera x=1206 y=64 z=1334 yaw=89.12 pitch=0.88, aimed with /execute in minecraft:the_end run tp IconCapture 1206 64 1334 facing 1076 62 1336; FOV 70 vertical, seed 1234567890. sha256 8a28c04a94e6f4d0f5feb720f9795b48ef415272c8367427a07393145d36ae55."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Parallel projection: End ship broadside",
+  "path": "captures-floodedend/renders/ortho-01-broadside.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.06.04.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. Orthographic frame: the level projection was replaced by a parallel one at focal distance 48 (see evidence/orthographic-proof.json). Camera x=1150 y=62 z=1306 yaw=0.0 pitch=8.13, aimed with /execute in minecraft:the_end run tp IconCapture 1150 62 1306 facing 1150 58 1334; FOV 70 vertical, seed 1234567890. sha256 d1d5ab153d8517a1fcb4ec0b63a1eca251b822947ca20992c1ed37c55abbc73d."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Parallel projection: End ship at the waterline",
+  "path": "captures-floodedend/renders/ortho-02-hero.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/runtime/screenshots/2026-09-17_15.06.31.png (moved to renders/); world the delivered world fabric/run/server/FloodProbe (seed 1234567890, End sea level 58, water surface y=57)",
+  "notes": "the chosen ship: origin [1136,54,1328], 29x24x13, keel y=54, deck y=61, mast top y=77, moored in the End sea. Orthographic frame from the hero camera: parallel projection at focal distance 48, hull, waterline and reflection at constant scale. Camera x=1150 y=59 z=1314 yaw=0.0 pitch=1.43, aimed with /execute in minecraft:the_end run tp IconCapture 1150 59 1314 facing 1150 58.5 1334; FOV 70 vertical, seed 1234567890. sha256 5c45cd7a02c7eba803fe96efe0acbb28e0b5b0fc69dd0c486c95ba7f39a3be14."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Parallel-projection control: the same camera in perspective",
+  "path": "captures-floodedend/evidence/ortho-00-control-perspective.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/evidence/ortho-00-control-perspective.png",
+  "notes": "Same camera and ship as ortho-01-broadside with the parallel projection switched off, so the pair can be compared: evidence/ortho-compare.png puts them side by side. sha256 3d29e5229614bc2d0001da12b6f1fd69b3d44ccfce11d3dd09874ee746c92661."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Perspective (left) against parallel (right), same camera",
+  "path": "captures-floodedend/evidence/ortho-compare.png",
+  "method": "Real Minecraft 26.2 production client (Fabric Loader 0.19.3, Iris 1.11.4 + Sodium 0.9.2, ComplementaryUnbound_r5.8.1, vertical FOV 70) on the owned 1600x1600 Xvfb, connected to a real dedicated Fabric server running the built floodedend-1.0.0.jar. Native F2 screenshot at 1600x1600, F1 HUD hidden, no crop and no post-processing.",
+  "source": "captures-floodedend/evidence/ortho-compare.png",
+  "notes": "Built from evidence/ortho-00-control-perspective.png and renders/ortho-01-broadside.png, downscaled to 760x760 each and placed side by side, no other processing. sha256 370c4b8eb3b4a41bb6921f453aaba2cd0e9ae95516728325a2425fae96805969."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Cinematic set, contact sheet",
+  "path": "captures-floodedend/evidence/render-contact-sheet.png",
+  "method": "Built by captures-floodedend/tools/verify-captures.py from the eight delivered 1600x1600 renders, downscaled to 400x400 each.",
+  "source": "captures-floodedend/renders/*.png",
+  "notes": "Five columns, row-major: cine-01-hero-low, cine-02-bow-on, cine-03-stern-on, cine-04-mast-sky, cine-05-wide-ocean, cine-06-city-behind, ortho-01-broadside, ortho-02-hero. sha256 a5e18642352da8c110eedd8c413a1d0379d0fae2f210b3fa2e900a91d9d8cf8e."
+ },
+ {
+  "project": "FloodedEnd",
+  "label": "Chosen shot: ship astern over open water (1024 crop of the stern-on frame)",
+  "path": "captures-floodedend/renders/cine-03-stern-on-1024.png",
+  "method": "Crop of a native F2 capture - 1600x1600 minus 288 px on every edge, no resampling",
+  "source": "captures-floodedend/source-frames/cine-03-stern-on.png (1600x1600, seed 1234567890, camera x=1114 y=61 z=1334 yaw=90.00 pitch=0.00)",
+  "notes": "sha256 0f797da0515c205c... ; owner picked the stern-on frame and asked for a 1024x1024 crop of the same image"
+ }
+]

@@ -1,0 +1,189 @@
+{
+  "mod": "FloodedEnd",
+  "icon": {
+    "path": "docs/icon/icon.png",
+    "bytes": 1524680,
+    "pixels": [
+      1024,
+      1024
+    ],
+    "sha256": "0f797da0515c205c5ddf8394dc60ffa2904dc6eb0c4e5afdf956f3d8229e8396",
+    "round3Source": "round3/captures-floodedend/renders/cine-03-stern-on-1024.png",
+    "round3SourceSha256": "0f797da0515c205c5ddf8394dc60ffa2904dc6eb0c4e5afdf956f3d8229e8396",
+    "byteIdentical": true,
+    "method": "crop of a native F2 capture: 1600x1600 minus 288 px on every edge, no resampling"
+  },
+  "uncroppedFrame": {
+    "path": "docs/icon/provenance/source-frame/cine-03-stern-on.png",
+    "bytes": 5448159,
+    "pixels": [
+      1600,
+      1600
+    ],
+    "sha256": "a21c9ee9d9e24b7c7559b69e387404634687a6781d8d7e31c68be76e7667d062",
+    "round3Source": "round3/captures-floodedend/source-frames/cine-03-stern-on.png",
+    "round3SourceSha256": "a21c9ee9d9e24b7c7559b69e387404634687a6781d8d7e31c68be76e7667d062",
+    "capture": "Minecraft F2 screenshot 2026-09-17_15.04.24.png, world FloodProbe (seed 1234567890), camera x=1114 y=61 z=1334 yaw=270.0 pitch=-0.0, FOV 70 vertical"
+  },
+  "cropCheck": {
+    "script": "docs/icon/provenance/crop-icon.py",
+    "input": "docs/icon/provenance/source-frame/cine-03-stern-on.png",
+    "outputSha256": "0f797da0515c205c5ddf8394dc60ffa2904dc6eb0c4e5afdf956f3d8229e8396",
+    "byteIdenticalToIcon": true,
+    "command": "PYTHONPATH=/nix/store/4v9j9wbzyhrlx9980ygbr812313mazy0-python3.13-pillow-12.3.0/lib/python3.13/site-packages python3 provenance/crop-icon.py provenance/source-frame/cine-03-stern-on.png /tmp/icon.png"
+  },
+  "copiedFiles": [
+    {
+      "file": "provenance/manifest.json",
+      "round3Source": "round3/captures-floodedend/manifest.json",
+      "bytes": 12392,
+      "sha256": "af83accc27c3038d96cab309e9f43e59e05df507d2266a77743f69905c6c35a1",
+      "round3SourceSha256": "af83accc27c3038d96cab309e9f43e59e05df507d2266a77743f69905c6c35a1",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/reproduce.json",
+      "round3Source": "round3/captures-floodedend/reproduce.json",
+      "bytes": 4573,
+      "sha256": "29372daabc1f4e83468ac3d7cbbc4904d524064fcb331a5c7fd2e080e4d04ea0",
+      "round3SourceSha256": "29372daabc1f4e83468ac3d7cbbc4904d524064fcb331a5c7fd2e080e4d04ea0",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/blockers.json",
+      "round3Source": "round3/captures-floodedend/blockers.json",
+      "bytes": 2869,
+      "sha256": "692db93f5ffeaef3f74184660c10b858a52a101c29efb9e877c067e308ae2758",
+      "round3SourceSha256": "692db93f5ffeaef3f74184660c10b858a52a101c29efb9e877c067e308ae2758",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/cleanup-report.json",
+      "round3Source": "round3/captures-floodedend/cleanup-report.json",
+      "bytes": 5977,
+      "sha256": "4c2557fe2be961ee2498c95d6e034588123370b2e29a624e5b675bead5486092",
+      "round3SourceSha256": "4c2557fe2be961ee2498c95d6e034588123370b2e29a624e5b675bead5486092",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/harness/launch.sh",
+      "round3Source": "round3/captures-floodedend/launch.sh",
+      "bytes": 1532,
+      "sha256": "09102d3679f087bc84cc1cc01322976b3cde7fed63902d10a34c7f082405105d",
+      "round3SourceSha256": "09102d3679f087bc84cc1cc01322976b3cde7fed63902d10a34c7f082405105d",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/harness/client.args",
+      "round3Source": "round3/captures-floodedend/client.args",
+      "bytes": 14015,
+      "sha256": "b1912aa01e2b505e6f8bfaaf28b184e88b903b21d881a1ebb98535018e854d41",
+      "round3SourceSha256": "b1912aa01e2b505e6f8bfaaf28b184e88b903b21d881a1ebb98535018e854d41",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/harness/control.py",
+      "round3Source": "round3/captures-floodedend/tools/control.py",
+      "bytes": 2269,
+      "sha256": "9242b01aa80ef1b996cb8f9f59b9c9df35f4863999d543b6a11342a435e389de",
+      "round3SourceSha256": "9242b01aa80ef1b996cb8f9f59b9c9df35f4863999d543b6a11342a435e389de",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/harness/hud.py",
+      "round3Source": "round3/captures-floodedend/tools/hud.py",
+      "bytes": 1818,
+      "sha256": "8ecbfaf1f9f56a4e96954885126ba87a3a61831d537c2031f4eeaff2c6890afb",
+      "round3SourceSha256": "8ecbfaf1f9f56a4e96954885126ba87a3a61831d537c2031f4eeaff2c6890afb",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/harness/shoot.sh",
+      "round3Source": "round3/captures-floodedend/tools/shoot.sh",
+      "bytes": 813,
+      "sha256": "bbf1366af5509f63463c831322ce72ed155f2ede937891e8775036f2f651b704",
+      "round3SourceSha256": "bbf1366af5509f63463c831322ce72ed155f2ede937891e8775036f2f651b704",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/harness/shoot-set.sh",
+      "round3Source": "round3/captures-floodedend/tools/shoot-set.sh",
+      "bytes": 1156,
+      "sha256": "982d5fcb5469880274fa232e2e401653edffaba25eba6a94647f5974110c4a89",
+      "round3SourceSha256": "982d5fcb5469880274fa232e2e401653edffaba25eba6a94647f5974110c4a89",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/harness/verify-captures.py",
+      "round3Source": "round3/captures-floodedend/tools/verify-captures.py",
+      "bytes": 7692,
+      "sha256": "096cc1c826068a7a3c1402697127028f4fbf8bb3074a3797508afbd5fc14efb7",
+      "round3SourceSha256": "096cc1c826068a7a3c1402697127028f4fbf8bb3074a3797508afbd5fc14efb7",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/config/options.txt",
+      "round3Source": "round3/captures-floodedend/runtime/options.txt",
+      "bytes": 5227,
+      "sha256": "000441955c7cb5fc7e0006e98ae0bd983f427c5959ad5930d5f9b9ec17686846",
+      "round3SourceSha256": "000441955c7cb5fc7e0006e98ae0bd983f427c5959ad5930d5f9b9ec17686846",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/config/iris.properties",
+      "round3Source": "round3/captures-floodedend/runtime/config/iris.properties",
+      "bytes": 304,
+      "sha256": "aa4adeebe30c5fd126b78b85a303a5f8f0de2b12d1db57f0c39c2ea7e94a65b8",
+      "round3SourceSha256": "aa4adeebe30c5fd126b78b85a303a5f8f0de2b12d1db57f0c39c2ea7e94a65b8",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/config/sodium-options.json",
+      "round3Source": "round3/captures-floodedend/runtime/config/sodium-options.json",
+      "bytes": 743,
+      "sha256": "a254b8f531a8cef6ade6f1b860e80ee4cfbf5fb5905d0963c24b121c4f6518a2",
+      "round3SourceSha256": "a254b8f531a8cef6ade6f1b860e80ee4cfbf5fb5905d0963c24b121c4f6518a2",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/config/sodium-mixins.properties",
+      "round3Source": "round3/captures-floodedend/runtime/config/sodium-mixins.properties",
+      "bytes": 258,
+      "sha256": "b627c4456e6fa0bc4b5f85e2f1cd949faedae3cb9afdaf2a5f52e6f3b6ae1f01",
+      "round3SourceSha256": "b627c4456e6fa0bc4b5f85e2f1cd949faedae3cb9afdaf2a5f52e6f3b6ae1f01",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/config/ComplementaryUnbound_r5.8.1.zip.txt",
+      "round3Source": "round3/captures-floodedend/runtime/shaderpacks/ComplementaryUnbound_r5.8.1.zip.txt",
+      "bytes": 683,
+      "sha256": "230a0bf95867d079dd54befb01943f27f01ee962af7b9b8e2cfb7bc63ca09855",
+      "round3SourceSha256": "230a0bf95867d079dd54befb01943f27f01ee962af7b9b8e2cfb7bc63ca09855",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/evidence/chosen-ship.json",
+      "round3Source": "round3/captures-floodedend/evidence/chosen-ship.json",
+      "bytes": 3045,
+      "sha256": "52097850fe4f83f773202be66d9cf2f96b549781c2f708c9fc00c058210f5bef",
+      "round3SourceSha256": "52097850fe4f83f773202be66d9cf2f96b549781c2f708c9fc00c058210f5bef",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/evidence/client-run.txt",
+      "round3Source": "round3/captures-floodedend/evidence/client-run.txt",
+      "bytes": 4113,
+      "sha256": "aa85423d75e170858b866a92bf6440de31c835244cab55f645052c2f8b4f13be",
+      "round3SourceSha256": "aa85423d75e170858b866a92bf6440de31c835244cab55f645052c2f8b4f13be",
+      "byteIdentical": true
+    },
+    {
+      "file": "provenance/evidence/screenshot-verification.json",
+      "round3Source": "round3/captures-floodedend/evidence/screenshot-verification.json",
+      "bytes": 3184,
+      "sha256": "11172f0dd705bbb267bba7f48e85836e9962afef6d35ff863cff9bc14d066b08",
+      "round3SourceSha256": "11172f0dd705bbb267bba7f48e85836e9962afef6d35ff863cff9bc14d066b08",
+      "byteIdentical": true
+    }
+  ]
+}

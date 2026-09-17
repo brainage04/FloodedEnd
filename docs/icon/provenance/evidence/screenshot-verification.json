@@ -1,0 +1,105 @@
+{
+  "renders": [
+    {
+      "file": "renders/cine-01-hero-low.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "c6cb57d2f0d5a0612252a317bbb3cb434df88b100f8de4e23ca870705fddce96",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    },
+    {
+      "file": "renders/cine-02-bow-on.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "e471ca067ef62d8d2fed9caa66e0cd69da3a3f4e9bbefe1b2e90598bdcdf23e5",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    },
+    {
+      "file": "renders/cine-03-stern-on.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "a21c9ee9d9e24b7c7559b69e387404634687a6781d8d7e31c68be76e7667d062",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    },
+    {
+      "file": "renders/cine-04-mast-sky.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "a59e2f82ef18dd1b11ec4eb36aee02c32d0033568c88d3795358e634eea6c9c5",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    },
+    {
+      "file": "renders/cine-05-wide-ocean.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "0322aad5d9e3f090ab8a1a5b1d3e690a5a7ba4e70412f481b2170063d03a3639",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    },
+    {
+      "file": "renders/cine-06-city-behind.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "8a28c04a94e6f4d0f5feb720f9795b48ef415272c8367427a07393145d36ae55",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    },
+    {
+      "file": "renders/ortho-01-broadside.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "d1d5ab153d8517a1fcb4ec0b63a1eca251b822947ca20992c1ed37c55abbc73d",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    },
+    {
+      "file": "renders/ortho-02-hero.png",
+      "size": [
+        1600,
+        1600
+      ],
+      "square": true,
+      "sha256": "5c45cd7a02c7eba803fe96efe0acbb28e0b5b0fc69dd0c486c95ba7f39a3be14",
+      "bossBarPresent": false,
+      "crosshairPresent": false,
+      "scale": "native 1600x1600 F2 capture, no crop"
+    }
+  ],
+  "count": 8,
+  "allSquare": true,
+  "allCrosshairsHidden": true,
+  "noBossBar": true,
+  "check": "bossBarPresent looks for the Ender Dragon boss bar's saturated magenta in the top strip and crosshairPresent for the crosshair F1 would have hidden. The boss bar only appears while the dragon is alive and a player is in the End, which is why the renders were shot after the fight; every delivered frame was also read back by a vision pass that reported no HUD, chat or boss bar."
+}

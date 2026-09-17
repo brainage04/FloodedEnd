@@ -1,0 +1,60 @@
+{
+  "mod": "/home/thomas/01_TM/Coding/Minecraft/FloodedEnd at 69f6fd9 (four local commits, no push)",
+  "worlds": {
+    "delivered": "fabric/run/server/FloodProbe, seed 1234567890, End sea level 58, copied to captures-floodedend/runtime/saves/'Flooded End'",
+    "drowned": "fabric/run/server/FloodDrowned, seed 1234567890, End sea level 72 from datapacks/floodedend-preset"
+  },
+  "steps": [
+    {
+      "step": "Build both loaders and run both loaders' GameTests",
+      "command": "JAVA_HOME=<openjdk-25.0.4.1+1> ./gradlew build :fabric:runProductionServerGameTest :neoforge:runGameTestServer --rerun",
+      "expected": "'All 6 required tests passed :)' from each loader"
+    },
+    {
+      "step": "Generate the delivered world in two phases, because a structure's pieces are only placed by chunks that can see its start chunk",
+      "consoleCommands": [
+        "floodedend status",
+        "execute in minecraft:the_end run forceload add <city-32> <city-32> <city+32> <city+32>   (phase 1: each city centre, 12 cities)",
+        "execute in minecraft:the_end run forceload add <city-160> <city-160> <city+160> <city+160>   (phase 2, four quadrant commands per city, 256 chunks per command at most)",
+        "execute in minecraft:the_end run forceload add -120 -120 120 120   (the main island)",
+        "save-all flush",
+        "stop"
+      ]
+    },
+    {
+      "step": "Measure the world and export every ship to prove it is complete",
+      "command": "python3 captures-floodedend/tools/region-readback.py <world>/dimensions/minecraft/the_end/region --output captures-floodedend/evidence/end-readback-structures.json --map-step 8 --map-radius 120 ; python3 captures-floodedend/tools/export-ship.py <region dir> --marker=<x,y,z> --output <file>",
+      "expected": "13 ship markers = 6 complete 929-block ships + one 174-block bow fragment (see blockers.json), every complete ship with its keel at y=54 under a water surface of y=57"
+    },
+    {
+      "step": "Choose the most isolated complete ship and export it",
+      "expected": "evidence/chosen-ship.json picks the ship at origin [1136,54,1328]: 89% open water within 64 blocks, nearest land 34 blocks, nearest other structure 88 blocks, city 120 blocks; evidence/chosen-ship-export.json holds its 929 blocks with ids and states"
+    },
+    {
+      "step": "Start the server and the production client, and add the local ortho scratch mod",
+      "serverCommand": "systemd-run --user --scope -p CPUQuota=200% -p CPUWeight=20 ./gradlew :fabric:runServer",
+      "clientCommand": "DISPLAY=:213 PULSE_SINK=round3_floodedend sh captures-floodedend/launch.sh   (java @captures-floodedend/client.args, with /tmp/orthocam/orthocam-1.0.0.jar on the classpath and in -Dfabric.addMods)",
+      "orthoToggle": "echo 'on 48' > /tmp/ortho.cam   (or 'off 48' for the perspective control); the mod re-reads it every ten frames, so no restart is needed"
+    },
+    {
+      "step": "Shoot the cinematic set of the chosen ship",
+      "serverConsole": [
+        "gamemode spectator IconCapture",
+        "execute in minecraft:the_end run tp IconCapture <x> <y> <z> facing <tx> <ty> <tz>   (once per shot; cameras are in manifest.json)"
+      ],
+      "clientKeys": "Escape to leave the End poem, F1 to hide the HUD (checked with tools/hud.py), F2 for each native 1600x1600 screenshot (moved by tools/shoot.sh)",
+      "expected": "eight square frames with no HUD, chat, crosshair or boss bar: six cinematic and two with the parallel projection"
+    },
+    {
+      "step": "Verify the captures and the projection",
+      "command": "python3 captures-floodedend/tools/verify-captures.py ; python3 captures-floodedend/tools/verify-orthographic.py work/proof-ortho-near.png work/proof-ortho-far.png work/proof-persp-near.png work/proof-persp-far.png",
+      "expected": "allSquare, allCrosshairsHidden and noBossBar true; /tmp/ortho-matrix.txt records m23 = 0 for the parallel matrix against m23 = -1 for the perspective one"
+    }
+  ],
+  "caveats": [
+    "The production client is an offline-mode session, so it cannot chat or run commands: every camera move was issued from the dedicated server console, and the client only ever sent F1, F2 and Escape.",
+    "The client ran on llvmpipe (software OpenGL, Mesa 26.1.8); no GPU was used.",
+    "The End has no day cycle, so the set varies camera height and sky-facing angle rather than time of day.",
+    "The delivered world is the world the frames were shot in, and it carries the completed fight from the previous pass (the dragon is dead, the exit portal is active)."
+  ]
+}

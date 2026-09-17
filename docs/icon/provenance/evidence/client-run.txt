@@ -1,0 +1,56 @@
+# Client-run proof: production client (Fabric Loader, no dev launch) with Iris + Sodium and the built mod jar
+
+command: sh launch.sh under systemd-run --user --scope -p CPUQuota=200% -p CPUWeight=20 (two runs: the moored world,
+then the drowned world)
+display: Xvfb :213 1600x1600x24; audio sink: round3_floodedend (null)
+window: --width 1600 --height 1600 in client.args, so every F2 capture is a native 1600x1600 square
+client.args sha256: facea30ed7e98f07114ba812dabf24fb77d09ffaeef028805dc9a6bf6c6d1c9e
+
+## mod and shader load lines (client stdout, 2026-09-16 22:45 run)
+[22:45:23] [Render thread/INFO]: Reloading ResourceManager: vanilla, fabric-api, ..., fabricloader, floodedend, iris, sodium
+[22:45:23] [Render thread/INFO]: OpenGL Vendor: Mesa
+[22:45:23] [Render thread/INFO]: OpenGL Renderer: llvmpipe (LLVM 21.1.8, 256 bits)
+[22:45:23] [Render thread/INFO]: OpenGL Version: 4.6 (Core Profile) Mesa 26.1.8
+[22:45:25] [Render thread/INFO]: OpenAL initialized on device round3_floodedend
+[22:45:25] [Render thread/INFO]: Sound engine started
+[22:45:25] [Render thread/INFO]: Connecting to localhost, 25565
+[22:45:30] [Render thread/INFO]: Reloading pipeline on dimension change: null => minecraft:overworld
+[22:46:55] [Render thread/INFO]: Reloading pipeline on dimension change: minecraft:overworld => minecraft:the_end
+[22:48:40] [Render thread/INFO]: [System] [CHAT] Saved screenshot as 2026-09-16_22.48.38.png
+[22:51:57] [Render thread/INFO]: [System] [CHAT] Saved screenshot as 2026-09-16_22.51.56.png
+[23:00:46] [Render thread/WARN]: Client disconnected with reason: Server closed
+
+The same client, in the earlier moored-world run (21:56), logged the same loader and renderer lines and then the
+End arrival at 21:59:33; its later frames are the ten delivered renders.
+
+## shader pack file + settings actually used
+bb89b1fc54687d4147a837fb2e3c3f7261a13bee51819761e9b6a91cb7915965  runtime/shaderpacks/ComplementaryUnbound_r5.8.1.zip
+43308f2afa7c6adc1494905bcc6ebebc564f702257b7b7c03e0d5a716ce79324  runtime/shaderpacks/ComplementaryUnbound_r5.8.1.zip.txt
+
+## what the client could and could not do
+The session is offline-mode, so the client's chat is restricted ("Chat is restricted", "Sending commands is not
+allowed" as recorded in evidence/client-commands.txt). Every camera move was therefore issued from the dedicated
+server console with /execute in minecraft:the_end run tp IconCapture <x> <y> <z> facing <tx> <ty> <tz>, and the
+client only ever sent F1 (hide HUD), Escape (leave the End poem) and F2 (screenshot).
+
+## the jar both the server and the client loaded
+7614d7568e54398c5b455b014090899b7834da4afea8d9b9490cefda3ed23457  runtime/mods/floodedend-1.0.0.jar
+7614d7568e54398c5b455b014090899b7834da4afea8d9b9490cefda3ed23457  mods/floodedend-1.0.0.jar
+
+## the cinematic set (2026-09-17), with the local orthographic mod
+
+command: sh launch.sh under systemd-run --user --scope -p CPUQuota=200% -p CPUWeight=20
+display: Xvfb :213 1600x1600x24; audio sink: round3_floodedend (null); window --width 1600 --height 1600
+extra mod: /tmp/orthocam/orthocam-1.0.0.jar, on the classpath and in -Dfabric.addMods (source kept in tools/orthocam/)
+
+[Render thread/INFO]: [STDOUT]: ORTHO hook is live (enabled=false distance=64.0)
+[Render thread/INFO]: [STDOUT]: ORTHO perspective m=[m00 0.8540808 m11 0.8540808 m22 4.883051E-5 m23 -1.0 m32 0.05000244 m33 0.0]
+[Render thread/INFO]: [STDOUT]: ORTHO parallel    m=[m00 0.017793348 m11 0.017793348 m22 4.883051E-5 m23 0.0 m32 0.05000244 m33 0.0]
+(the parallel matrix has no divide by depth: m23 = 0, so w' is constant and the projection has no vanishing point)
+
+The same client shot both projections by rewriting /tmp/ortho.cam between frames; the two orthographic frames and
+the perspective control are in renders/ and evidence/, and the comparison is evidence/ortho-compare.png.
+
+One run crashed before this (exit 255): the first packaging of the scratch mod put its helper class inside the mixin
+package, which Mixin refuses to reference directly. Moving the helper to orthocam.* fixed it and the run above is
+the one that produced the delivered frames.

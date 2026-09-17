@@ -1,0 +1,91 @@
+{
+  "report": "Everything this capture started is stopped, and nothing outside the owned display and audio sink was touched.",
+  "processesStartedAndStopped": [
+    {
+      "name": "floodedend-server (Fabric dev dedicated server: three world generations, the fight evidence and the capture session)",
+      "command": "hub start systemd-run --user --scope -q -p CPUQuota=200% -p CPUWeight=20 ./gradlew :fabric:runServer",
+      "stopped": "console 'stop' each time; every run exited 0"
+    },
+    {
+      "name": "floodedend-client (production client with Iris + Sodium + the built mod + the local ortho scratch mod)",
+      "command": "hub start sh launch.sh (systemd-run --user --scope -p CPUQuota=200% -p CPUWeight=20)",
+      "stopped": "hub stop for every run; one run crashed on the first ortho mod packaging (mixin package rule) and was rebuilt and restarted"
+    },
+    {
+      "name": "floodedend-xvfb (owned display :213, 1600x1600x24)",
+      "command": "hub start sh -c 'Xvfb :213 -screen 0 1600x1600x24 -nolisten tcp -ac +extension GLX & wait'",
+      "stopped": "hub stop; 'pgrep -af Xvfb :213' reports nothing"
+    },
+    {
+      "name": "round3_floodedend (owned PipeWire null sink)",
+      "command": "pactl load-module module-null-sink sink_name=round3_floodedend",
+      "stopped": "pactl unload-module; the sink is gone from 'pactl list short sinks' and the only round3 sink left belongs to another agent"
+    },
+    {
+      "name": "GameTest servers",
+      "command": "./gradlew :fabric:runProductionServerGameTest :neoforge:runGameTestServer",
+      "stopped": "self-terminating; all 6 tests passed on both loaders"
+    }
+  ],
+  "isolation": {
+    "display": "The client only ever ran on the owned :213 Xvfb at 1600x1600.",
+    "audio": "The client's OpenAL device was the owned null sink round3_floodedend.",
+    "cpu": "Every Minecraft and gradle process ran under systemd-run --user --scope with CPUQuota=200% and CPUWeight=20."
+  },
+  "temporaryFilesRemoved": [
+    "captures-floodedend/work/ (review frames, HUD/GUI probes, the perspective/parallel comparison source images and the marker-proof frames)",
+    "captures-floodedend/runtime/screenshots/*.png (every F2 frame was moved into renders/ or evidence/)",
+    "the white concrete markers placed for the projection test, refilled with water",
+    "two generated worlds that were superseded during this iteration (the pre-clamp world and the pre-reach world); their measurements are kept in evidence as readbacks"
+  ],
+  "keptDeliberately": [
+    "captures-floodedend/renders/*.png - the eight delivered 1600x1600 cinematic frames",
+    "round3/removed/captures-floodedend/renders-v2/ - the ten previous candidate renders, retired at the owner's direction and logged in round3/removals.FloodedEndWater.json",
+    "captures-floodedend/evidence/ - readbacks and maps, chosen-ship.json, chosen-ship-export.json, measurements.json, fight-observations.json, orthographic-proof.json, the control and comparison frames, screenshot-verification.json, client-run.txt, floodedend-probe.txt, teardown.txt",
+    "captures-floodedend/tools/orthocam/ - the scratch mod source, its mixin config and the built jar that produced the parallel frames",
+    "captures-floodedend/runtime/saves/'Flooded End' - byte copy of the delivered world the cinematic set was shot in",
+    "FloodedEnd/fabric/run/server/FloodProbe and FloodDrowned - the server worlds (gitignored)"
+  ],
+  "authorScripts": {
+    "note": "every script and jar used to measure, shoot or verify this work, with its sha256",
+    "scripts": {
+      "control.py": "9242b01aa80ef1b996cb8f9f59b9c9df35f4863999d543b6a11342a435e389de",
+      "export-ship.py": "b944f388a8880a4a5a96dc0494b4a7132b5fbaf596703978333df357437afb16",
+      "hud.py": "8ecbfaf1f9f56a4e96954885126ba87a3a61831d537c2031f4eeaff2c6890afb",
+      "region-readback.py": "e0aa79a43a075927b900ba89983719de7afc799c55020be6d4acbf2b2a05640c",
+      "sheet.py": "de24098b10dcf66d75522f212883dde8ef7b018d4cd95ea9f8688bafd6195f75",
+      "shoot-set.sh": "982d5fcb5469880274fa232e2e401653edffaba25eba6a94647f5974110c4a89",
+      "shoot.sh": "bbf1366af5509f63463c831322ce72ed155f2ede937891e8775036f2f651b704",
+      "structure-template-dump.py": "75087f394553a01a834c893d7d9c0ca37158e7b2d856fef41679b4b6f9c44fc7",
+      "verify-captures.py": "096cc1c826068a7a3c1402697127028f4fbf8bb3074a3797508afbd5fc14efb7",
+      "verify-orthographic.py": "bfeec022c5c4e24072049f52421dbee867ba79fb5866b6c2d49998f81c1924a7",
+      "client.args": "b1912aa01e2b505e6f8bfaaf28b184e88b903b21d881a1ebb98535018e854d41",
+      "launch.sh": "09102d3679f087bc84cc1cc01322976b3cde7fed63902d10a34c7f082405105d",
+      "orthocam/orthocam-1.0.0.jar": "8fd44fbea37857b26e7d0722a09cd56c5076f118d94bfb8da17a97cb31095798",
+      "orthocam/src/orthocam/OrthoProjection.java": "e6430436dbf2440fcc3db0fb47ebddd3630c76d3ce22bf847df5b076205a1024",
+      "orthocam/src/orthocam/mixin/GameRendererMixin.java": "2a4954f7250e4fad7e80cd1c2fd36ef504b134e656173d67f4604aa4cc8c385f"
+    }
+  },
+  "untouched": [
+    "/home/thomas/01_TM/Coding/Minecraft/FloodedEnd/The End Used to Be Full of Water [uFRwAIN5jAo].webm",
+    "/home/thomas/01_TM/Coding/Minecraft/FloodedEnd/prompt.txt",
+    "every other project under round3/ and the portfolio repository's tracked files"
+  ],
+  "diskUsage": {
+    "captures-floodedend": "372M",
+    "FloodedEnd": "486M",
+    "freeSpaceAfter": "352G free on /"
+  },
+  "git": {
+    "repository": "/home/thomas/01_TM/Coding/Minecraft/FloodedEnd",
+    "commits": 7,
+    "pushed": false,
+    "workingTree": "clean",
+    "thisIteration": [
+      "5c903cd Keep moored End ships inside the structure's reference radius",
+      "f4b915a Keep a moored End ship inside its own city's neighbourhood",
+      "4108cde Record where a moored ship may end up"
+    ],
+    "notCommitted": "the reference .webm and prompt.txt are gitignored; the scratch ortho mod lives in the captures workspace, not in the mod repository"
+  }
+}
