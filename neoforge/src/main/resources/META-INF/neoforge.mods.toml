@@ -6,6 +6,7 @@ license="MIT"
 modId="floodedend"
 version="${version}"
 displayName="FloodedEnd"
+logoFile="assets/floodedend/icon.png"
 authors="brainage04"
 description='''Restores the End's ocean: the dimension generates with water as its default fluid and a global End sea, so its basins, hollows and the void between the islands flood and the islands rise out of open water.'''
 
