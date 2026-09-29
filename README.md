@@ -98,7 +98,7 @@ requested sea level.
 ## Requirements
 
 - Minecraft 26.2, Java 25
-- Fabric Loader 0.19.3+ with Fabric API, or NeoForge 26.2.0.41-beta
+- Fabric Loader 0.19.3+ with Fabric API, or NeoForge 26.2.0.88
 - Server side only; installing it on the client changes nothing.
 
 ## Concepts
