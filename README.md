@@ -118,6 +118,10 @@ The design follows the concepts in
 - **Endermen displacing blocks / the End draining.** Not implemented: it is lore narration, not world generation.
   The one mechanic the flooding suggests — Endermen and water — is scoped in the underwater notes.
 
+## Publishing
+
+Release automation is documented in [docs/RELEASE.md](docs/RELEASE.md). Optional Modrinth publishing is documented in [docs/MODRINTH.md](docs/MODRINTH.md).
+
 ## Licence
 
 MIT.

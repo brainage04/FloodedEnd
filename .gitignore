@@ -32,9 +32,8 @@ bin/
 
 .fabric/
 mods/
-**/run/
+**/run/*
 !**/run/options.txt
-!**/run/server/options.txt
 logs/
 
 # java
@@ -48,6 +47,7 @@ replay_*.log
 
 .codex
 
-# local reference material for this mod's design (not part of the mod)
+# FloodedEnd
+
 *.webm
 prompt.txt
