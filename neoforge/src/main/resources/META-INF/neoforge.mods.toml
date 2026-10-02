@@ -15,13 +15,13 @@ description='''Restores the End's ocean: the dimension generates with water as i
 [[dependencies.floodedend]]
 modId="neoforge"
 type="required"
-versionRange="[${neoforge_version},26.3)"
+versionRange="[${neoforge_version},)"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.floodedend]]
 modId="minecraft"
 type="required"
-versionRange="[${minecraft_version},26.3)"
+versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
