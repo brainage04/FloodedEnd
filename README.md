@@ -87,7 +87,7 @@ The full numbers, the arrival and departure tests and the reason submerged flora
 ```shell
 ./gradlew build          # common + fabric + neoforge
 ./gradlew :fabric:runProductionServerGameTest
-./gradlew :neoforge:runGameTestServer
+./gradlew :neoforge:runGameTest
 ```
 
 The GameTests assert the contracts the mod ships: that `minecraft:end` resolves to a water default fluid above a
