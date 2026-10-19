@@ -1,0 +1,7 @@
+{
+  "environment": "minecraft:default",
+  "structure": "fabricmoddingconventions:empty",
+  "max_ticks": 100,
+  "type": "minecraft:function",
+  "function": "floodedend:commands_respect_permissions_and_report_errors"
+}

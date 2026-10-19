@@ -17,3 +17,9 @@ Each name below existed once on Fabric and once on NeoForge. There were no unit 
 - `endShipTemplateResolves`: tautological. Only checks that Minecraft's vanilla ship template has a positive size, not that a generated ship is moored.
 
 The three flagged tests were removed on both loaders, including their shared assertions and NeoForge test registrations/resources. No test was classified as redundant.
+
+## Coverage additions
+
+Both loader suites now exercise permission rejection, live status, preset listing, unknown preset feedback, loaded and unloaded probes, actual ocean blocks in the central void, dry/capped columns with air gaps, both preset files through command dispatch, all ship rotations at both waterlines, reference-radius fallback, generated city buildings and dry-world parity against vanilla across sixteen deterministic structure seeds. File changes and column changes are restored in `finally` blocks.
+
+Remaining gaps: a full world restart with a preset selected, the dragon fight and portal lifecycle, and visual ship/hull placement across a broad range of world seeds. These need more than an isolated GameTest; the historical manual observations are in `THE_END_UNDER_WATER.md`. There are no mod gamerules, config screen, renderer, background threads or shutdown resources.
