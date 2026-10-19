@@ -65,6 +65,7 @@ Other data packs that replace `minecraft:end` noise settings or `minecraft:end_c
 
 ## Documentation
 
+- [Test review](docs/TEST_REVIEW.md) - test classifications and coverage.
 - [Underwater End notes](docs/THE_END_UNDER_WATER.md) - terrain measurements, ship placement and dragon fight observations.
 - [Development](docs/DEVELOPMENT.md) - building and GameTests.
 - [Release automation](docs/RELEASE.md)

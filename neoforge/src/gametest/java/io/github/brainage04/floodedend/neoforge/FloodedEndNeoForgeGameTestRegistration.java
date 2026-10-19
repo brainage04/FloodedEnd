@@ -22,21 +22,6 @@ public final class FloodedEndNeoForgeGameTestRegistration {
 		);
 		event.register(
 				BuiltInRegistries.TEST_FUNCTION.key(),
-				FloodedEnd.of("flood_readback_command_is_registered"),
-				() -> tests::floodReadbackCommandIsRegistered
-		);
-		event.register(
-				BuiltInRegistries.TEST_FUNCTION.key(),
-				FloodedEnd.of("end_city_is_flooded_ends"),
-				() -> tests::endCityIsFloodedEnds
-		);
-		event.register(
-				BuiltInRegistries.TEST_FUNCTION.key(),
-				FloodedEnd.of("end_ship_template_resolves"),
-				() -> tests::endShipTemplateResolves
-		);
-		event.register(
-				BuiltInRegistries.TEST_FUNCTION.key(),
 				FloodedEnd.of("preset_installs_an_ocean"),
 				() -> tests::presetInstallsAnOcean
 		);

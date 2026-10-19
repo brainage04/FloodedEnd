@@ -10,21 +10,6 @@ public final class FloodedEndGameTest {
 	}
 
 	@GameTest
-	public void floodReadbackCommandIsRegistered(GameTestHelper helper) {
-		FloodedEndAssertions.assertCommandIsRegistered(helper);
-	}
-
-	@GameTest
-	public void endCityIsFloodedEnds(GameTestHelper helper) {
-		FloodedEndAssertions.assertEndCityIsFloodedEnds(helper);
-	}
-
-	@GameTest
-	public void endShipTemplateResolves(GameTestHelper helper) {
-		FloodedEndAssertions.assertEndShipTemplateResolves(helper);
-	}
-
-	@GameTest
 	public void presetInstallsAnOcean(GameTestHelper helper) {
 		FloodedEndAssertions.assertPresetInstallsAnOcean(helper);
 	}

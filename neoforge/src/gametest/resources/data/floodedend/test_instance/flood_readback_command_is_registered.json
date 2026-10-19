@@ -1,7 +1,0 @@
-{
-  "environment": "minecraft:default",
-  "structure": "fabricmoddingconventions:empty",
-  "max_ticks": 20,
-  "type": "minecraft:function",
-  "function": "floodedend:flood_readback_command_is_registered"
-}

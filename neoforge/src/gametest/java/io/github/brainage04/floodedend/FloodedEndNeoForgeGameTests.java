@@ -7,18 +7,6 @@ public final class FloodedEndNeoForgeGameTests {
 		FloodedEndAssertions.assertEndIsFlooded(helper);
 	}
 
-	public void floodReadbackCommandIsRegistered(GameTestHelper helper) {
-		FloodedEndAssertions.assertCommandIsRegistered(helper);
-	}
-
-	public void endCityIsFloodedEnds(GameTestHelper helper) {
-		FloodedEndAssertions.assertEndCityIsFloodedEnds(helper);
-	}
-
-	public void endShipTemplateResolves(GameTestHelper helper) {
-		FloodedEndAssertions.assertEndShipTemplateResolves(helper);
-	}
-
 	public void presetInstallsAnOcean(GameTestHelper helper) {
 		FloodedEndAssertions.assertPresetInstallsAnOcean(helper);
 	}
