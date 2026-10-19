@@ -2,8 +2,6 @@
 
 FloodedEnd is server-side only. Client GameTests are disabled because the mod has no client entrypoint, renderer or client fixtures. CI builds both loader jars and runs the production server GameTests on Fabric and NeoForge.
 
-The build and reusable workflows use FabricModdingConventions 2.4.26.
-
 ## Building
 
 ```shell
@@ -13,4 +11,3 @@ The build and reusable workflows use FabricModdingConventions 2.4.26.
 
 Run these through `heavy` in the Minecraft workspace. `runAllGameTests` runs the production server suites for Fabric and NeoForge; the individual tasks are `:fabric:runProductionServerGameTest` and `:neoforge:runProductionServerGameTest`.
 
-The GameTests assert the contracts the mod ships: the End ocean and sea-level preset data packs.
