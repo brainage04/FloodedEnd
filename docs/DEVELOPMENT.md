@@ -5,8 +5,8 @@ FloodedEnd is server-side only. Client GameTests are disabled because the mod ha
 ## Building
 
 ```shell
-./gradlew --no-daemon -Pfabricmoddingconventions.devClientOptions=/nonexistent build
-./gradlew --no-daemon -Pfabricmoddingconventions.devClientOptions=/nonexistent runAllGameTests
+./gradlew --no-daemon build
+./gradlew --no-daemon runAllGameTests
 ```
 
 Run these through `heavy` in the Minecraft workspace. `runAllGameTests` runs the production server suites for Fabric and NeoForge; the individual tasks are `:fabric:runProductionServerGameTest` and `:neoforge:runProductionServerGameTest`.

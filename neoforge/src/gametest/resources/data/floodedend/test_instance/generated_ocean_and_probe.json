@@ -1,6 +1,6 @@
 {
   "environment": "minecraft:default",
-  "structure": "fabricmoddingconventions:empty",
+  "structure": "minecraftmodconventions:empty",
   "max_ticks": 100,
   "type": "minecraft:function",
   "function": "floodedend:generated_ocean_and_probe"
