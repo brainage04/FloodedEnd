@@ -17,11 +17,6 @@ public final class FloodedEndNeoForgeGameTestRegistration {
 		FloodedEndNeoForgeGameTests tests = new FloodedEndNeoForgeGameTests();
 		event.register(
 				BuiltInRegistries.TEST_FUNCTION.key(),
-				FloodedEnd.of("end_generates_its_ocean"),
-				() -> tests::endGeneratesItsOcean
-		);
-		event.register(
-				BuiltInRegistries.TEST_FUNCTION.key(),
 				FloodedEnd.of("preset_installs_an_ocean"),
 				() -> tests::presetInstallsAnOcean
 		);

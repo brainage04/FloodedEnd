@@ -70,14 +70,14 @@ public final class FloodedEndCommand {
 		ServerLevel end = source.getServer().getLevel(Level.END);
 		for (EndOceanPreset preset : EndOceanPreset.PRESETS) {
 			source.sendSuccess(() -> Component.literal(
-					"FloodedEnd preset " + preset.id() + ": End sea level " + preset.seaLevel() + " — " + preset.description()
+					"FloodedEnd preset " + preset.id() + ": End sea level " + preset.seaLevel() + " – " + preset.description()
 			), false);
 		}
 
 		source.sendSuccess(() -> Component.literal(
-				"FloodedEnd: this world is running " + (EndOceanPreset.installed(source.getServer())
-						? "an installed preset data pack"
-						: "the shipped End ocean")
+				"FloodedEnd: this world's preset data pack is " + (EndOceanPreset.installed(source.getServer())
+						? "installed"
+						: "not installed")
 						+ (end == null ? "" : " (" + EndOcean.of(end).describe() + ")")
 						+ ". Presets change world generation, so they apply to chunks generated after the next server start."
 		), false);
@@ -112,7 +112,10 @@ public final class FloodedEndCommand {
 	private static int clearPreset(CommandContext<CommandSourceStack> context) {
 		CommandSourceStack source = context.getSource();
 		try {
-			EndOceanPreset.remove(source.getServer());
+			if (!EndOceanPreset.remove(source.getServer())) {
+				source.sendFailure(Component.literal("No FloodedEnd preset is installed."));
+				return 0;
+			}
 		} catch (IOException error) {
 			source.sendFailure(Component.literal("Could not clear the FloodedEnd preset: " + error.getMessage()));
 			return 0;

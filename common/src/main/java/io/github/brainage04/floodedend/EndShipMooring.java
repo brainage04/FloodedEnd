@@ -1,8 +1,7 @@
 package io.github.brainage04.floodedend;
 
-import java.util.HashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
@@ -22,7 +21,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  * <p>Vanilla builds the End ship from {@code end_city/ship} at the top of the city's tower, tens of blocks above the
  * water, where it reads as floating in the sky. This class finds those ships in a finished city and lowers each one
  * until its keel is {@value #SHIP_DRAFT} blocks under the water surface, at the nearest column whose seabed leaves
- * the whole hull clear of ground — so a ship sits in the water instead of in a hillside, and stays as close to its
+ * the whole hull clear of ground – so a ship sits in the water instead of in a hillside, and stays as close to its
  * city as the sea allows.</p>
  *
  * <p>Nothing else about the city is touched: the towers, the bridges that used to lead to each ship and the rest of
@@ -40,12 +39,10 @@ public final class EndShipMooring {
 	 * neighbourhood its city's structure was saved with.
 	 */
 	private static final int MOORING_REACH = 48;
-	/** Mooring search and seabed sampling resolution; the seabed is sampled on this block grid. */
+	/** Candidate moorings are searched on this block grid. */
 	private static final int MOORING_STEP = 8;
 	/** Blocks of water left between the seabed and the keel, so no hull ever meets ground. */
 	private static final int MOORING_CLEARANCE = 2;
-	/** A hull is sampled over its footprint at these offsets, which covers a ship template turned any way. */
-	private static final int[] FOOTPRINT_OFFSETS = {-16, -8, 0, 8, 16};
 
 	private EndShipMooring() {
 	}
@@ -117,7 +114,8 @@ public final class EndShipMooring {
 		BlockPos origin = ((TemplateStructurePiece) ship).templatePosition();
 		BoundingBox hull = ship.getBoundingBox();
 		BoundingBox area = placeableArea(context);
-		Map<Long, Integer> seabed = new HashMap<>();
+		Long2IntOpenHashMap seabed = new Long2IntOpenHashMap();
+		seabed.defaultReturnValue(Integer.MIN_VALUE);
 		for (int reach = 0; reach <= MOORING_REACH; reach += MOORING_STEP) {
 			for (int dz = -reach; dz <= reach; dz += MOORING_STEP) {
 				for (int dx = -reach; dx <= reach; dx += MOORING_STEP) {
@@ -139,15 +137,13 @@ public final class EndShipMooring {
 	/** True when the seabed under the whole hull stays {@value #MOORING_CLEARANCE} blocks below the keel. */
 	private static boolean floats(
 			Structure.GenerationContext context,
-			Map<Long, Integer> seabed,
+			Long2IntOpenHashMap seabed,
 			BoundingBox hull,
 			int keelY
 	) {
-		int centreX = (hull.minX() + hull.maxX()) / 2;
-		int centreZ = (hull.minZ() + hull.maxZ()) / 2;
-		for (int offsetX : FOOTPRINT_OFFSETS) {
-			for (int offsetZ : FOOTPRINT_OFFSETS) {
-				if (seabed(context, seabed, centreX + offsetX, centreZ + offsetZ) > keelY - MOORING_CLEARANCE) {
+		for (int x = hull.minX(); x <= hull.maxX(); x++) {
+			for (int z = hull.minZ(); z <= hull.maxZ(); z++) {
+				if (seabed(context, seabed, x, z) > keelY - MOORING_CLEARANCE) {
 					return false;
 				}
 			}
@@ -156,16 +152,15 @@ public final class EndShipMooring {
 		return true;
 	}
 
-	/** The ocean floor height, sampled once per {@value #MOORING_STEP}-block cell of the search area. */
-	private static int seabed(Structure.GenerationContext context, Map<Long, Integer> seabed, int x, int z) {
-		int gridX = x & ~(MOORING_STEP - 1);
-		int gridZ = z & ~(MOORING_STEP - 1);
-		long key = ((long) (gridX / MOORING_STEP) << 32) | ((gridZ / MOORING_STEP) & 0xFFFFFFFFL);
-		return seabed.computeIfAbsent(
-				key,
-				ignored -> context.chunkGenerator().getFirstOccupiedHeight(
-						gridX, gridZ, Heightmap.Types.OCEAN_FLOOR_WG, context.heightAccessor(), context.randomState()
-				)
-		);
+	/** The exact ocean floor height, cached across overlapping candidate hulls. */
+	private static int seabed(Structure.GenerationContext context, Long2IntOpenHashMap seabed, int x, int z) {
+		long key = BlockPos.asLong(x, 0, z);
+		int height = seabed.get(key);
+		if (height == Integer.MIN_VALUE) {
+			height = context.chunkGenerator().getFirstOccupiedHeight(
+					x, z, Heightmap.Types.OCEAN_FLOOR_WG, context.heightAccessor(), context.randomState());
+			seabed.put(key, height);
+		}
+		return height;
 	}
 }

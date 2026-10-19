@@ -42,10 +42,9 @@ Every hull footprint column is water (`siteWaterFraction` 1.0) and the seabed un
 below the keel, so no ship is buried in an island and none is left in the sky. The keel sits three blocks under the
 water surface, which puts the hull's lower four layers in the water and its deck one block above it.
 
-The cities themselves are unchanged: the same seed produces the same cities at the same bases, because
-`floodedend:end_city` asks the ocean floor heightmap for placement. Vanilla asks the world surface heightmap, which
-under an ocean answers with the water surface and would reject any city whose five-by-five placement box touches
-flooded ground.
+The cities themselves use the dry End's terrain-based placement gate, because `floodedend:end_city` asks the ocean
+floor heightmap for placement. Vanilla asks the world surface heightmap, so a higher ocean can raise the placement
+box above the real terrain and admit cities whose ground would otherwise be too low.
 
 ## The dragon fight
 

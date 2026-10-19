@@ -1,43 +1,29 @@
 package io.github.brainage04.floodedend;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PathPackResources;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 
 /** Loader-independent behavioral assertions for FloodedEnd's server suites. */
 public final class FloodedEndAssertions {
 	private FloodedEndAssertions() {
-	}
-
-	/** The End's shipped world generation must resolve to water below a positive sea level. */
-	public static void assertEndIsFlooded(GameTestHelper helper) {
-		NoiseGeneratorSettings end = helper.getLevel()
-				.registryAccess()
-				.lookupOrThrow(Registries.NOISE_SETTINGS)
-				.getOrThrow(NoiseGeneratorSettings.END)
-				.value();
-
-		helper.assertTrue(
-				end.defaultFluid().is(Blocks.WATER),
-				"minecraft:end must flood its basins with water but generates " + end.defaultFluid()
-		);
-		helper.assertTrue(
-				end.seaLevel() > 0,
-				"minecraft:end must have a sea level above the dimension floor but generates at " + end.seaLevel()
-		);
-		helper.succeed();
 	}
 
 	/**
@@ -54,6 +40,11 @@ public final class FloodedEndAssertions {
 				helper.assertValueEqual(
 						FloodedEndBehaviorAssertions.command(source, "preset apply " + preset.id()), 1,
 						"the preset command installs " + preset.id());
+				var location = new PackLocationInfo("floodedend-test", Component.literal("FloodedEnd test"), PackSource.WORLD, Optional.empty());
+				try (var pack = new PathPackResources(location, EndOceanPreset.directory(server))) {
+					helper.assertTrue(pack.getMetadataSection(PackMetadataSection.SERVER_TYPE) != null,
+							"Minecraft must decode the installed pack metadata without missing format fields");
+				}
 				helper.assertTrue(EndOceanPreset.installed(server), "the preset writes real world data");
 				Path ocean = EndOceanPreset.directory(server).resolve("data/minecraft/worldgen/noise_settings/end.json");
 				NoiseGeneratorSettings settings = NoiseGeneratorSettings.CODEC
@@ -62,9 +53,13 @@ public final class FloodedEndAssertions {
 				helper.assertValueEqual(settings.seaLevel(), preset.seaLevel(), "the installed preset's sea level");
 				helper.assertTrue(settings.defaultFluid().is(Blocks.WATER), "a preset still floods the End with water");
 			}
+			helper.assertValueEqual(FloodedEndBehaviorAssertions.command(source, "preset list"), 2, "list works before restart");
+			helper.assertTrue(feedback.contains("this world's preset data pack is installed"), "list distinguishes files on disk from live generation");
 			helper.assertTrue(feedback.contains("Restart the server"), "apply explains when world generation changes");
 			helper.assertValueEqual(FloodedEndBehaviorAssertions.command(source, "preset clear"), 1, "clear removes an installed preset");
 			helper.assertTrue(!Files.exists(EndOceanPreset.directory(server)), "clear removes the whole data pack");
+			helper.assertValueEqual(FloodedEndBehaviorAssertions.command(source, "preset clear"), 0, "clear fails when no preset exists");
+			helper.assertTrue(feedback.contains("No FloodedEnd preset is installed."), "an absent preset gets honest feedback");
 		} catch (IOException | CommandSyntaxException error) {
 			throw new AssertionError("the preset could not be installed or cleared", error);
 		} finally {

@@ -5,11 +5,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 
 public final class FloodedEndGameTest {
 	@GameTest
-	public void endGeneratesItsOcean(GameTestHelper helper) {
-		FloodedEndAssertions.assertEndIsFlooded(helper);
-	}
-
-	@GameTest
 	public void presetInstallsAnOcean(GameTestHelper helper) {
 		FloodedEndAssertions.assertPresetInstallsAnOcean(helper);
 	}

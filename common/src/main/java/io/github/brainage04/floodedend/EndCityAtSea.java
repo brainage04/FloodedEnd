@@ -21,11 +21,9 @@ import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
  * vanilla generates it. Two things change once the End has an ocean:</p>
  *
  * <ul>
- *     <li><b>Placement ignores the water.</b> Vanilla asks the world surface heightmap where the ground is, and
- *     with an ocean that heightmap answers with the water surface instead. A city whose five-by-five sample box
- *     touches flooded ground is then rejected, so the flooded End would silently lose cities. Asking the ocean
- *     floor heightmap instead gives the answer vanilla gets on a dry End, which keeps the same cities for the same
- *     seed.</li>
+ *     <li><b>Placement ignores the water.</b> Vanilla asks the world surface heightmap where the ground is.
+ *     A higher ocean can raise that answer above the real terrain and admit cities without suitable ground.
+ *     Asking the ocean floor heightmap instead preserves the dry End's terrain-based placement gate.</li>
  *     <li><b>Its ship is moored</b> by {@link EndShipMooring}, which lowers the hull from the top of the city's
  *     tower onto the sea.</li>
  * </ul>

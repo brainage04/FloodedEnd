@@ -80,10 +80,10 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 	}
 
 	/** Removes any installed preset, leaving the world on the sea level the mod ships. */
-	public static void remove(MinecraftServer server) throws IOException {
+	public static boolean remove(MinecraftServer server) throws IOException {
 		Path root = directory(server);
 		if (!Files.exists(root)) {
-			return;
+			return false;
 		}
 
 		try (Stream<Path> paths = Files.walk(root)) {
@@ -91,6 +91,7 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 				Files.delete(path);
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -116,6 +117,8 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 		return "{\n"
 				+ "  \"pack\": {\n"
 				+ "    \"pack_format\": " + packFormat + ",\n"
+				+ "    \"min_format\": " + packFormat + ",\n"
+				+ "    \"max_format\": " + packFormat + ",\n"
 				+ "    \"description\": \"FloodedEnd preset: " + id + " (End sea level " + seaLevel + ")\"\n"
 				+ "  }\n"
 				+ "}\n";

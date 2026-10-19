@@ -10,18 +10,18 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
@@ -131,6 +131,28 @@ public final class FloodedEndBehaviorAssertions {
 		BlockPos position = outside.templatePosition();
 		EndShipMooring.moor(context, List.<StructurePiece>of(outside), EndOcean.of(end));
 		helper.assertValueEqual(outside.templatePosition(), position, "a ship with no placeable mooring stays at its original position");
+		var coast = new Structure.GenerationContext(end.registryAccess(), generator, generator.getBiomeSource(),
+				end.getChunkSource().randomState(), end.getStructureManager(), end.getSeed(), new ChunkPos(0, 0), end, biome -> true);
+		int moored = 0;
+		for (Rotation rotation : Rotation.values()) {
+			for (int x : new int[]{64, 96}) {
+				var ship = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(x, 120, 0), rotation, true);
+				EndShipMooring.moor(coast, List.of(ship), EndOcean.of(end));
+				var hull = ship.getBoundingBox();
+				if (hull.minY() != 54) {
+					continue;
+				}
+				moored++;
+				for (int hullX = hull.minX(); hullX <= hull.maxX(); hullX++) {
+					for (int hullZ = hull.minZ(); hullZ <= hull.maxZ(); hullZ++) {
+						int ground = generator.getFirstOccupiedHeight(hullX, hullZ,
+								net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG, end, end.getChunkSource().randomState());
+						helper.assertTrue(ground <= 52, "every hull column clears the real seabed, including between old grid samples");
+					}
+				}
+			}
+		}
+		helper.assertTrue(moored > 0, "the shoreline samples include a moored ship");
 		helper.succeed();
 	}
 
