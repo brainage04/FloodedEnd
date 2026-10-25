@@ -7,12 +7,14 @@ of a running dedicated server with a production client connected.
 ## Where the waterline sits
 
 The End's terrain is unchanged, so the sea level only has to be chosen well. The numbers that chose it, from the
-delivered world (seed 1234567890, sea level 58):
+delivered world (seed 1234567890, sea level 58). They were measured on Minecraft 26.2; the main island's ground and
+the ground at the exit portal were measured again on 26.3 (single-precision terrain) with the same result, by the
+GameTest `main_island_stays_above_the_water`, which logs them. The other rows are 26.2 measurements.
 
 | landmark | y |
 | --- | --- |
 | water surface | 57 |
-| main island's ground around the exit portal (within 40 blocks) | min 59, median 62, max 63 |
+| main island's ground around the exit portal (within 40 blocks) | min 59, median 62, max 63 (26.2 and 26.3) |
 | exit portal | a 5x5 ring of `minecraft:end_portal` at y=63, the dragon egg above it at y=67 |
 | obsidian pillars | bases at y=32, tops from y=77 to y=104 |
 | arrival platform | 5x5 of obsidian at y=48 |
@@ -20,8 +22,8 @@ delivered world (seed 1234567890, sea level 58):
 | End ships, before this change | hull from y=130 to y=153, decks around y=136 |
 
 So a water surface at y=57 sits on the island's rim: the island stays dry by two to six blocks, the exit portal and
-the pillars stay dry, and the arrival platform is nine blocks under water. The whole surrounding void — 66% of the
-water columns in the delivered world are the full 58-block column — floods.
+the pillars stay dry, and the arrival platform is nine blocks under water. The whole surrounding void floods: 66% of the
+water columns in the delivered world are the full 58-block column.
 
 ## What happened to the ships
 

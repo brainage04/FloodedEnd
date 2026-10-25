@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
@@ -31,6 +32,9 @@ import net.minecraft.world.level.levelgen.structure.structures.EndCityStructure;
 
 /** Exercises real command dispatch, generated blocks and structure templates on both loaders. */
 public final class FloodedEndBehaviorAssertions {
+	/** The seed of the world {@code docs/THE_END_UNDER_WATER.md} was measured in. */
+	private static final long DOCUMENTED_SEED = 1234567890L;
+
 	private FloodedEndBehaviorAssertions() {
 	}
 
@@ -79,6 +83,47 @@ public final class FloodedEndBehaviorAssertions {
 			throw new AssertionError(error);
 		}
 		helper.succeed();
+	}
+
+	/**
+	 * The shipped sea level must leave the main island dry. Measures the generated ground (the top non-fluid block)
+	 * within 40 blocks of the exit portal for this test world's seed and for the seed {@code THE_END_UNDER_WATER.md}
+	 * was measured with, straight from the End's noise, and logs the numbers the documentation quotes.
+	 */
+	public static void assertMainIslandStaysAboveTheWater(GameTestHelper helper) {
+		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
+		helper.assertTrue(end != null, "the End is loaded");
+		var generator = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
+		EndOcean ocean = EndOcean.of(end);
+		helper.assertTrue(ocean.flooded(), "the End generates its ocean");
+		for (long seed : new long[]{end.getSeed(), DOCUMENTED_SEED}) {
+			RandomState randomState = RandomState.create(end.registryAccess().lookupOrThrow(Registries.NOISE), seed,
+					generator.generatorSettings().value());
+			List<Integer> ground = new ArrayList<>();
+			for (int x = -40; x <= 40; x++) {
+				for (int z = -40; z <= 40; z++) {
+					if (x * x + z * z <= 40 * 40) {
+						ground.add(groundY(generator, end, randomState, x, z));
+					}
+				}
+			}
+			ground.sort(null);
+			int min = ground.getFirst();
+			int median = ground.get(ground.size() / 2);
+			int max = ground.getLast();
+			int portal = groundY(generator, end, randomState, 0, 0);
+			FloodedEnd.LOGGER.info("FloodedEnd main island ground within 40 blocks of the exit portal, seed {}: "
+					+ "min {}, median {}, max {}; ground at the portal {}; water surface {}",
+					seed, min, median, max, portal, ocean.waterSurfaceY());
+			helper.assertTrue(min > ocean.waterSurfaceY(),
+					"the main island stays above the water surface for seed " + seed + " (lowest ground y=" + min + ")");
+		}
+		helper.succeed();
+	}
+
+	private static int groundY(NoiseBasedChunkGenerator generator, ServerLevel end, RandomState randomState, int x, int z) {
+		// A heightmap height is the first y above the column's top block.
+		return generator.getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, end, randomState) - 1;
 	}
 
 	public static void assertProbeHandlesDryAndCappedColumns(GameTestHelper helper) {
