@@ -45,6 +45,11 @@ public final class EndCityAtSea extends Structure {
 
 	@Override
 	protected Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
+		// Vanilla 26.3's cheap biome check, before any heightmap is sampled.
+		if (!context.couldValidBiomeExistInTerrainColumn(context.chunkPos().getBlockX(7), context.chunkPos().getBlockZ(7))) {
+			return Optional.empty();
+		}
+
 		EndOcean ocean = EndOcean.of(context.chunkGenerator());
 		Rotation rotation = Rotation.getRandom(context.random());
 		int groundY = lowestGroundY(context, rotation, ocean);
@@ -62,7 +67,7 @@ public final class EndCityAtSea extends Structure {
 
 	/**
 	 * The lowest of the four corners of the chunk's five-by-five placement box, offset seven blocks, measured
-	 * exactly as {@code Structure#getLowestYIn5by5BoxOffset7Blocks} measures it. The only difference is which
+	 * exactly as {@code Structure#getLowestYIn5by5Box} measures it. The only difference is which
 	 * heightmap is asked: the ocean floor once the End is flooded, the world surface (vanilla's choice) when it is
 	 * dry.
 	 */
