@@ -22,6 +22,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
@@ -113,13 +115,15 @@ public final class FloodedEndBehaviorAssertions {
 	public static void assertShipsMoorAtBothWaterlines(GameTestHelper helper) {
 		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
 		var generator = end.getChunkSource().getGenerator();
+		RandomState randomState = end.getChunkSource().randomState();
 		Structure.GenerationContext context = new Structure.GenerationContext(
-				end.registryAccess(), generator, generator.getBiomeSource(), end.getChunkSource().randomState(),
-				end.getStructureManager(), end.getSeed(), new ChunkPos(32, 32), end, biome -> true);
+				end.registryAccess(), generator, generator.getBiomeSource(),
+				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
+				end.getStructureTemplateManager(), end.getSeed(), new ChunkPos(32, 32), end, biome -> true);
 		for (Rotation rotation : Rotation.values()) {
 			for (EndOceanPreset preset : EndOceanPreset.PRESETS) {
-				var ship = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(512, 120, 512), rotation, true);
-				var tower = new EndCityPieces.EndCityPiece(end.getStructureManager(), "base_floor", new BlockPos(512, 64, 512), rotation, true);
+				var ship = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(512, 120, 512), rotation, true);
+				var tower = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "base_floor", new BlockPos(512, 64, 512), rotation, true);
 				BlockPos towerPosition = tower.templatePosition();
 				EndShipMooring.moor(context, List.of(ship, tower), new EndOcean(preset.seaLevel(), Blocks.WATER.defaultBlockState(), false));
 				helper.assertValueEqual(ship.getBoundingBox().minY(), preset.seaLevel() - 4, "ship keel follows the preset waterline");
@@ -127,16 +131,17 @@ public final class FloodedEndBehaviorAssertions {
 			}
 		}
 		// An out-of-reference ship must not be moved into a position that will be truncated on placement.
-		var outside = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(1024, 120, 1024), Rotation.NONE, true);
+		var outside = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(1024, 120, 1024), Rotation.NONE, true);
 		BlockPos position = outside.templatePosition();
 		EndShipMooring.moor(context, List.<StructurePiece>of(outside), EndOcean.of(end));
 		helper.assertValueEqual(outside.templatePosition(), position, "a ship with no placeable mooring stays at its original position");
 		var coast = new Structure.GenerationContext(end.registryAccess(), generator, generator.getBiomeSource(),
-				end.getChunkSource().randomState(), end.getStructureManager(), end.getSeed(), new ChunkPos(0, 0), end, biome -> true);
+				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
+				end.getStructureTemplateManager(), end.getSeed(), new ChunkPos(0, 0), end, biome -> true);
 		int moored = 0;
 		for (Rotation rotation : Rotation.values()) {
 			for (int x : new int[]{64, 96}) {
-				var ship = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(x, 120, 0), rotation, true);
+				var ship = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(x, 120, 0), rotation, true);
 				EndShipMooring.moor(coast, List.of(ship), EndOcean.of(end));
 				var hull = ship.getBoundingBox();
 				if (hull.minY() != 54) {
@@ -165,8 +170,8 @@ public final class FloodedEndBehaviorAssertions {
 		var flooded = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
 		var settings = flooded.generatorSettings().value();
 		var drySettings = new NoiseGeneratorSettings(settings.noiseSettings(), settings.defaultBlock(), Blocks.AIR.defaultBlockState(),
-				settings.noiseRouter(), settings.surfaceRule(), settings.spawnTarget(), 0, settings.disableMobGeneration(),
-				settings.aquifersEnabled(), settings.oreVeinsEnabled(), settings.useLegacyRandomSource());
+				settings.noiseRouter(), settings.materialRule(), settings.spawnTarget(), 0, settings.disableMobGeneration(),
+				settings.aquifers(), settings.useLegacyRandomSource(), settings.debugFunctions());
 		var dry = new NoiseBasedChunkGenerator(flooded.getBiomeSource(), Holder.direct(drySettings));
 		int ships = 0;
 		for (int seed = 0; seed < 16; seed++) {
@@ -184,7 +189,7 @@ public final class FloodedEndBehaviorAssertions {
 			helper.assertValueEqual(wet.size(), expected.size(), "flooding preserves the city's pieces");
 			for (int i = 0; i < wet.size(); i++) {
 				var piece = (net.minecraft.world.level.levelgen.structure.TemplateStructurePiece) wet.get(i);
-				if (piece.template() == end.getStructureManager().getOrCreate(Identifier.withDefaultNamespace("end_city/ship"))) {
+				if (piece.template() == end.getStructureTemplateManager().getOrCreate(Identifier.withDefaultNamespace("end_city/ship"))) {
 					ships++;
 				} else {
 					helper.assertValueEqual(piece.getBoundingBox().toString(), expected.get(i).getBoundingBox().toString(),
@@ -197,8 +202,10 @@ public final class FloodedEndBehaviorAssertions {
 	}
 
 	private static Structure.GenerationContext cityContext(ServerLevel end, ChunkGenerator generator, long seed) {
+		RandomState randomState = end.getChunkSource().randomState();
 		return new Structure.GenerationContext(end.registryAccess(), generator, generator.getBiomeSource(),
-				end.getChunkSource().randomState(), end.getStructureManager(), seed, new ChunkPos(0, 0), end, biome -> true);
+				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
+				end.getStructureTemplateManager(), seed, new ChunkPos(0, 0), end, biome -> true);
 	}
 
 
