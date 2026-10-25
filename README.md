@@ -1,6 +1,6 @@
 # FloodedEnd
 
-A server-side Fabric/NeoForge mod for Minecraft 26.2 that puts the ocean back into the End.
+A server-side Fabric/NeoForge mod for Minecraft 26.3 that puts the ocean back into the End.
 
 The End normally generates as scattered islands over an endless void. FloodedEnd restores the sea the dimension
 is described as having had: `minecraft:end` now generates with **water** as its default fluid and a global **End
@@ -41,8 +41,8 @@ generated after the next server start. `clear` removes it again.
 
 ## Getting started
 
-- Minecraft 26.2, Java 25
-- Fabric Loader 0.19.3+ with Fabric API, or NeoForge 26.2.0.88+
+- Minecraft 26.3, Java 25
+- Fabric Loader 0.19.5+ with Fabric API, or NeoForge 26.3.0.99+
 - Server side only; installing it on the client changes nothing.
 
 ## Commands
