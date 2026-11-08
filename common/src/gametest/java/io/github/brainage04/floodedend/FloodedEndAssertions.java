@@ -21,15 +21,10 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 
-/** Loader-independent behavioral assertions for FloodedEnd's server suites. */
 public final class FloodedEndAssertions {
 	private FloodedEndAssertions() {
 	}
 
-	/**
-	 * A preset must install the world's End ocean as a data pack the game itself can read back at the requested
-	 * waterline, and clearing it must leave the world on the shipped ocean again.
-	 */
 	public static void assertPresetInstallsAnOcean(GameTestHelper helper) {
 		MinecraftServer server = helper.getLevel().getServer();
 		var feedback = new FloodedEndBehaviorAssertions.Feedback();

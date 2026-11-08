@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-/** Server-side readback and sea-level presets for the flooded End. */
 public final class FloodedEndCommand {
 	public static final String COMMAND_NAME = "floodedend";
 

@@ -15,48 +15,24 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
-/**
- * Moors the End ships of a generated city onto the End's sea.
- *
- * <p>Vanilla builds the End ship from {@code end_city/ship} at the top of the city's tower, tens of blocks above the
- * water, where it reads as floating in the sky. This class finds those ships in a finished city and lowers each one
- * until its keel is {@value #SHIP_DRAFT} blocks under the water surface, at the nearest column whose seabed leaves
- * the whole hull clear of ground – so a ship sits in the water instead of in a hillside, and stays as close to its
- * city as the sea allows.</p>
- *
- * <p>Nothing else about the city is touched: the towers, the bridges that used to lead to each ship and the rest of
- * the structure keep vanilla's placement. A ship is never moved outside the structure's own reference radius, because
- * a chunk only places the pieces of a start within {@link ChunkStatus#MAX_STRUCTURE_DISTANCE} chunks of it.</p>
- */
 public final class EndShipMooring {
-	/** The ship template is the only End city piece that puts a hull in the world. */
 	private static final Identifier SHIP_TEMPLATE = Identifier.withDefaultNamespace("end_city/ship");
-	/** How deep the hull sits in the water, counted from the keel up to the water surface. */
 	public static final int SHIP_DRAFT = 3;
 	/**
-	 * A ship may be moved this far from where vanilla puts it, to find water deep enough to float in. Measured
-	 * moorings need 1 to 14 blocks, so this is generous; keeping it small also keeps a moored ship inside the
-	 * neighbourhood its city's structure was saved with.
+	 * Measured moorings need 1 to 14 blocks; keeping the reach small also keeps a moored ship inside the neighbourhood
+	 * its city's structure was saved with.
 	 */
 	private static final int MOORING_REACH = 48;
-	/** Candidate moorings are searched on this block grid. */
 	private static final int MOORING_STEP = 8;
-	/** Blocks of water left between the seabed and the keel, so no hull ever meets ground. */
 	private static final int MOORING_CLEARANCE = 2;
 
 	private EndShipMooring() {
 	}
 
-	/** The y a ship's keel floats at when the water surface is {@code waterSurfaceY}. */
 	public static int keelY(int waterSurfaceY) {
 		return waterSurfaceY - SHIP_DRAFT;
 	}
 
-	/**
-	 * Lowers every ship in {@code pieces} onto the sea. Ships that have no water deep enough within
-	 * {@value #MOORING_REACH} blocks are left where vanilla put them and reported, rather than being dropped into
-	 * ground or silently moved somewhere that reads worse.
-	 */
 	public static void moor(Structure.GenerationContext context, List<StructurePiece> pieces, EndOcean ocean) {
 		StructureTemplate ship = context.structureTemplateManager().getOrCreate(SHIP_TEMPLATE);
 		int keelY = keelY(ocean.waterSurfaceY());
@@ -106,10 +82,6 @@ public final class EndShipMooring {
 				&& box.minZ() >= area.minZ() && box.maxZ() <= area.maxZ();
 	}
 
-	/**
-	 * The nearest column whose seabed leaves the whole hull clear of ground, searched outwards from where vanilla
-	 * puts the ship, so a ship stays as close to its city as the sea allows.
-	 */
 	private static Optional<BlockPos> findMooring(Structure.GenerationContext context, StructurePiece ship, int keelY) {
 		BlockPos origin = ((TemplateStructurePiece) ship).templatePosition();
 		BoundingBox hull = ship.getBoundingBox();
@@ -134,7 +106,6 @@ public final class EndShipMooring {
 		return Optional.empty();
 	}
 
-	/** True when the seabed under the whole hull stays {@value #MOORING_CLEARANCE} blocks below the keel. */
 	private static boolean floats(
 			Structure.GenerationContext context,
 			Long2IntOpenHashMap seabed,
@@ -152,7 +123,6 @@ public final class EndShipMooring {
 		return true;
 	}
 
-	/** The exact ocean floor height, cached across overlapping candidate hulls. */
 	private static int seabed(Structure.GenerationContext context, Long2IntOpenHashMap seabed, int x, int z) {
 		long key = BlockPos.asLong(x, 0, z);
 		int height = seabed.get(key);

@@ -27,7 +27,6 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityStructure;
 
-/** Exercises real command dispatch, generated blocks and structure templates on both loaders. */
 public final class FloodedEndBehaviorAssertions {
 	private FloodedEndBehaviorAssertions() {
 	}
@@ -126,7 +125,6 @@ public final class FloodedEndBehaviorAssertions {
 				helper.assertValueEqual(tower.templatePosition(), towerPosition, "mooring does not move city towers");
 			}
 		}
-		// An out-of-reference ship must not be moved into a position that will be truncated on placement.
 		var outside = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(1024, 120, 1024), Rotation.NONE, true);
 		BlockPos position = outside.templatePosition();
 		EndShipMooring.moor(context, List.<StructurePiece>of(outside), EndOcean.of(end));

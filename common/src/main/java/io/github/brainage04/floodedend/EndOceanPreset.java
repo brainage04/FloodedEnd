@@ -21,25 +21,17 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.storage.LevelResource;
 
 /**
- * A sea level the mod can generate the End with, installed into a world as a data pack.
- *
- * <p>Minecraft decides the End's waterline from the {@code minecraft:end} noise settings, and those are read from
- * data packs when a world is loaded. A higher or lower ocean therefore cannot be a runtime setting: it is a data
- * pack the world carries. This record is the mod's own way of producing that data pack, so one mod ships both the
- * shipped ocean and a drowned End without anyone hand-editing JSON.</p>
- *
- * <p>{@code minecraft:end_city} reads the live sea level back out of the chunk generator, so a world using a
- * preset moors its End ships at that preset's waterline.</p>
+ * Minecraft decides the End's waterline from the {@code minecraft:end} noise settings, and those are read from data
+ * packs when a world is loaded. A higher or lower ocean therefore cannot be a runtime setting: it is a data pack the
+ * world carries.
  */
 public record EndOceanPreset(String id, int seaLevel, String description) {
-	/** The shipped ocean: the waterline sits on the main island's rim, which keeps the island and the exit portal dry. */
 	public static final EndOceanPreset MOORED = new EndOceanPreset(
 			"moored",
 			58,
 			"the End sea at the main island's rim (y=57). The island, the exit portal and the obsidian pillars stay "
 					+ "dry; the arrival platform is under water and every End ship is moored at the waterline."
 	);
-	/** The drowned End: the waterline is above the main island, so the whole arena is under water. */
 	public static final EndOceanPreset DROWNED = new EndOceanPreset(
 			"drowned",
 			72,
@@ -50,7 +42,6 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 	);
 	public static final List<EndOceanPreset> PRESETS = List.of(MOORED, DROWNED);
 
-	/** The directory the mod writes into the world's {@code datapacks} folder. */
 	public static final String DIRECTORY = "floodedend-preset";
 	private static final String OCEAN_RESOURCE = "/data/minecraft/worldgen/noise_settings/end.json";
 	private static final String OCEAN_PATH = "data/minecraft/worldgen/noise_settings/end.json";
@@ -67,10 +58,6 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 		return Files.isRegularFile(directory(server).resolve(OCEAN_PATH));
 	}
 
-	/**
-	 * Writes this preset into the world as a data pack, replacing any preset already installed there. The new sea
-	 * level applies to chunks generated after the next server start.
-	 */
 	public void install(MinecraftServer server) throws IOException {
 		remove(server);
 		Path root = directory(server);
@@ -79,7 +66,6 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 		Files.writeString(root.resolve(OCEAN_PATH), ocean(), StandardCharsets.UTF_8);
 	}
 
-	/** Removes any installed preset, leaving the world on the sea level the mod ships. */
 	public static boolean remove(MinecraftServer server) throws IOException {
 		Path root = directory(server);
 		if (!Files.exists(root)) {
@@ -94,10 +80,6 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 		return true;
 	}
 
-	/**
-	 * The preset's ocean settings: the mod's own {@code minecraft:end} noise settings with this sea level written
-	 * into it, so the shipped world generation data stays the single source of truth.
-	 */
 	private String ocean() throws IOException {
 		try (InputStream stream = EndOceanPreset.class.getResourceAsStream(OCEAN_RESOURCE)) {
 			if (stream == null) {

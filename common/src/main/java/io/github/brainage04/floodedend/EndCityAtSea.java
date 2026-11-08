@@ -15,21 +15,9 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilde
 import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
 
 /**
- * The End city as it generates in the flooded End.
- *
- * <p>Vanilla builds the city and its ship from the same templates this class uses, so the city is left exactly as
- * vanilla generates it. Two things change once the End has an ocean:</p>
- *
- * <ul>
- *     <li><b>Placement ignores the water.</b> Vanilla asks the world surface heightmap where the ground is.
- *     A higher ocean can raise that answer above the real terrain and admit cities without suitable ground.
- *     Asking the ocean floor heightmap instead preserves the dry End's terrain-based placement gate.</li>
- *     <li><b>Its ship is moored</b> by {@link EndShipMooring}, which lowers the hull from the top of the city's
- *     tower onto the sea.</li>
- * </ul>
- *
- * <p>The sea level and the fluid are read back out of the running chunk generator, so a world using a different
- * waterline moors its ships at that world's waterline, and a dry End keeps vanilla's placement of both.</p>
+ * Vanilla asks the world surface heightmap where the ground is. A higher ocean can raise that answer above the real
+ * terrain and admit cities without suitable ground, so placement asks the ocean floor heightmap once the End is
+ * flooded.
  */
 public final class EndCityAtSea extends Structure {
 	public static final String NAME = "end_city";
@@ -61,10 +49,8 @@ public final class EndCityAtSea extends Structure {
 	}
 
 	/**
-	 * The lowest of the four corners of the chunk's five-by-five placement box, offset seven blocks, measured
-	 * exactly as {@code Structure#getLowestYIn5by5BoxOffset7Blocks} measures it. The only difference is which
-	 * heightmap is asked: the ocean floor once the End is flooded, the world surface (vanilla's choice) when it is
-	 * dry.
+	 * Measured exactly as {@code Structure#getLowestYIn5by5BoxOffset7Blocks}, which always asks the world surface
+	 * heightmap; this asks the ocean floor once the End is flooded.
 	 */
 	private static int lowestGroundY(GenerationContext context, Rotation rotation, EndOcean ocean) {
 		int dx = 5;
