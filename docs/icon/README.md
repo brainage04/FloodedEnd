@@ -1,6 +1,6 @@
 # FloodedEnd icon
 
-## What this is
+## The icon
 
 `icon.png` is FloodedEnd's project icon: a 1024x1024 PNG (1,524,680 bytes,
 RGBA), sha256 `0f797da0515c205c5ddf8394dc60ffa2904dc6eb0c4e5afdf956f3d8229e8396`.
@@ -9,7 +9,7 @@ It shows the delivered mod's most isolated moored End ship seen from astern over
 open water: hull, waterline and mast against the End sky, with the island shelf
 low at the right edge.
 
-## How it was made
+## Making the icon
 
 **A real in-game capture**, not a render and not generated pixel art.
 
@@ -57,7 +57,7 @@ to reproduce `icon.png` byte for byte.
 
 ## Provenance files
 
-| File | What it is |
+| File | Description |
 | --- | --- |
 | `source-frame/cine-03-stern-on.png` | the uncropped 1600x1600 native F2 frame the icon was cut from |
 | `crop-icon.py` | the crop step, with the expected icon sha256 asserted; its output is `docs/icon/icon.png`, which is not duplicated under `provenance/` |
@@ -74,9 +74,9 @@ to reproduce `icon.png` byte for byte.
 | `evidence/chosen-ship.json` | why this ship was chosen (isolation measurements) |
 | `evidence/client-run.txt` | client stdout proof: loader, llvmpipe renderer, shader pack, world join, screenshot lines, and the captured mod jar's sha256 |
 | `evidence/screenshot-verification.json` | per-frame verification of the eight cinematic frames (`allSquare`, `allCrosshairsHidden`, `noBossBar` true) |
-| `verification.json` | sha256 of `icon.png`, of the uncropped frame, of every copied file, and the crop check — all copies are byte-identical to their round3 sources |
+| `verification.json` | sha256 of `icon.png`, of the uncropped frame, of every copied file, and the crop check – all copies are byte-identical to their round3 sources |
 
-## How to regenerate
+## Regenerating the icon
 
 Working directory: the mod repository (`FloodedEnd/`). The copied scripts contain
 absolute paths into the round3 capture workspace
