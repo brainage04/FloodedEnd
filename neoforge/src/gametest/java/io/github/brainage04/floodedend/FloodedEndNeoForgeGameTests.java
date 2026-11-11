@@ -26,4 +26,12 @@ public final class FloodedEndNeoForgeGameTests {
 	public void cityGenerationPreservesDryVanilla(GameTestHelper helper) {
 		FloodedEndBehaviorAssertions.assertCityGenerationPreservesDryVanilla(helper);
 	}
+
+	public void stalePresetIsUpgradedBeforeLoading(GameTestHelper helper) {
+		FloodedEndAssertions.assertStalePresetIsUpgradedBeforeLoading(helper);
+	}
+
+	public void mainIslandStaysAboveTheWater(GameTestHelper helper) {
+		FloodedEndBehaviorAssertions.assertMainIslandStaysAboveTheWater(helper);
+	}
 }

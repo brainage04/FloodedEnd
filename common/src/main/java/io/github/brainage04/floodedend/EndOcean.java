@@ -24,7 +24,7 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
 	public static EndOcean of(ChunkGenerator generator) {
 		if (generator instanceof NoiseBasedChunkGenerator noise) {
 			NoiseGeneratorSettings settings = noise.generatorSettings().value();
-			return new EndOcean(settings.seaLevel(), settings.defaultFluid(), settings.isAquifersEnabled());
+			return new EndOcean(settings.seaLevel(), settings.defaultFluid(), settings.aquifers().isPresent());
 		}
 
 		return new EndOcean(0, Blocks.AIR.defaultBlockState(), false);

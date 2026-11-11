@@ -1,6 +1,6 @@
 # FloodedEnd
 
-A server-side Fabric/NeoForge mod for Minecraft 26.2 that puts the ocean back into the End.
+A server-side Fabric/NeoForge mod for Minecraft 26.3 that puts the ocean back into the End.
 
 The End normally generates as scattered islands over an endless void. FloodedEnd restores the sea the dimension
 is described as having had: `minecraft:end` now generates with **water** as its default fluid and a global **End
@@ -16,8 +16,10 @@ vanilla water.
 
 No terrain is reshaped – the islands are the vanilla islands, now drowned up to y=57.
 Sea level 58 was chosen from the measured terrain. The main island's ground around the exit portal sits between
-y=59 and y=63, so a water surface at y=57 keeps the island, the exit portal and the obsidian pillars dry while the
-island's slopes, every hollow and the whole surrounding void flood.
+y=59 and y=63 (seed 1234567890, measured again on Minecraft 26.3 by the GameTest `main_island_stays_above_the_water`,
+which also checks that no ground within 40 blocks of the portal is under water), so a water surface at y=57 keeps the
+island, the exit portal and the obsidian pillars dry while the island's slopes, every hollow and the whole surrounding
+void flood.
 
 ### End cities and their ships
 
@@ -39,10 +41,16 @@ writes into the world:
 `apply` writes `datapacks/floodedend-preset` in the world and says so; the new waterline applies to chunks
 generated after the next server start. `clear` removes it again.
 
+The preset holds the End's noise settings in the format of the Minecraft version that wrote it, and a world whose
+data packs do not decode refuses to load. When a world is opened, FloodedEnd therefore rewrites a preset written for
+an older Minecraft version (for example one applied on 26.2) for the running version and keeps its sea level; the log
+says `FloodedEnd: rewrote the drowned preset (End sea level 72) ...`. Without FloodedEnd installed, such a world only
+loads after `datapacks/floodedend-preset` is deleted.
+
 ## Getting started
 
-- Minecraft 26.2, Java 25
-- Fabric Loader 0.19.3+ with Fabric API, or NeoForge 26.2.0.88+
+- Minecraft 26.3, Java 25
+- Fabric Loader 0.19.5+ with Fabric API, or NeoForge 26.3.0.99+
 - Server side only; installing it on the client changes nothing.
 
 ## Commands

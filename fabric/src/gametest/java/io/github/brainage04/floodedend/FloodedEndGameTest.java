@@ -33,4 +33,14 @@ public final class FloodedEndGameTest {
 	public void cityGenerationPreservesDryVanilla(GameTestHelper helper) {
 		FloodedEndBehaviorAssertions.assertCityGenerationPreservesDryVanilla(helper);
 	}
+
+	@GameTest
+	public void stalePresetIsUpgradedBeforeLoading(GameTestHelper helper) {
+		FloodedEndAssertions.assertStalePresetIsUpgradedBeforeLoading(helper);
+	}
+
+	@GameTest
+	public void mainIslandStaysAboveTheWater(GameTestHelper helper) {
+		FloodedEndBehaviorAssertions.assertMainIslandStaysAboveTheWater(helper);
+	}
 }

@@ -30,5 +30,9 @@ public final class FloodedEndNeoForgeGameTestRegistration {
 				() -> tests::shipsMoorAtBothWaterlines);
 		event.register(BuiltInRegistries.TEST_FUNCTION.key(), FloodedEnd.of("city_generation_preserves_dry_vanilla"),
 				() -> tests::cityGenerationPreservesDryVanilla);
+		event.register(BuiltInRegistries.TEST_FUNCTION.key(), FloodedEnd.of("stale_preset_is_upgraded_before_loading"),
+				() -> tests::stalePresetIsUpgradedBeforeLoading);
+		event.register(BuiltInRegistries.TEST_FUNCTION.key(), FloodedEnd.of("main_island_stays_above_the_water"),
+				() -> tests::mainIslandStaysAboveTheWater);
 	}
 }

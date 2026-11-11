@@ -7,12 +7,14 @@ of a running dedicated server with a production client connected.
 ## The waterline
 
 The End's terrain is unchanged, so the sea level only has to be chosen well. These measurements chose it, in the
-delivered world (seed 1234567890, sea level 58):
+delivered world (seed 1234567890, sea level 58). They were measured on Minecraft 26.2; the main island's ground and
+the ground at the exit portal were measured again on 26.3 (single-precision terrain) with the same result, by the
+GameTest `main_island_stays_above_the_water`, which logs them. The other rows are 26.2 measurements.
 
 | landmark | y |
 | --- | --- |
 | water surface | 57 |
-| main island's ground around the exit portal (within 40 blocks) | min 59, median 62, max 63 |
+| main island's ground around the exit portal (within 40 blocks) | min 59, median 62, max 63 (26.2 and 26.3) |
 | exit portal | a 5x5 ring of `minecraft:end_portal` at y=63, the dragon egg above it at y=67 |
 | obsidian pillars | bases at y=32, tops from y=77 to y=104 |
 | arrival platform | 5x5 of obsidian at y=48 |

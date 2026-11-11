@@ -20,14 +20,20 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityStructure;
 
 public final class FloodedEndBehaviorAssertions {
+	/** The seed of the world {@code docs/THE_END_UNDER_WATER.md} was measured in. */
+	private static final long DOCUMENTED_SEED = 1234567890L;
+
 	private FloodedEndBehaviorAssertions() {
 	}
 
@@ -78,6 +84,47 @@ public final class FloodedEndBehaviorAssertions {
 		helper.succeed();
 	}
 
+	/**
+	 * The shipped sea level must leave the main island dry. Measures the generated ground (the top non-fluid block)
+	 * within 40 blocks of the exit portal for this test world's seed and for the seed {@code THE_END_UNDER_WATER.md}
+	 * was measured with, straight from the End's noise, and logs the numbers the documentation quotes.
+	 */
+	public static void assertMainIslandStaysAboveTheWater(GameTestHelper helper) {
+		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
+		helper.assertTrue(end != null, "the End is loaded");
+		var generator = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
+		EndOcean ocean = EndOcean.of(end);
+		helper.assertTrue(ocean.flooded(), "the End generates its ocean");
+		for (long seed : new long[]{end.getSeed(), DOCUMENTED_SEED}) {
+			RandomState randomState = RandomState.create(end.registryAccess().lookupOrThrow(Registries.NOISE), seed,
+					generator.generatorSettings().value());
+			List<Integer> ground = new ArrayList<>();
+			for (int x = -40; x <= 40; x++) {
+				for (int z = -40; z <= 40; z++) {
+					if (x * x + z * z <= 40 * 40) {
+						ground.add(groundY(generator, end, randomState, x, z));
+					}
+				}
+			}
+			ground.sort(null);
+			int min = ground.getFirst();
+			int median = ground.get(ground.size() / 2);
+			int max = ground.getLast();
+			int portal = groundY(generator, end, randomState, 0, 0);
+			FloodedEnd.LOGGER.info("FloodedEnd main island ground within 40 blocks of the exit portal, seed {}: "
+					+ "min {}, median {}, max {}; ground at the portal {}; water surface {}",
+					seed, min, median, max, portal, ocean.waterSurfaceY());
+			helper.assertTrue(min > ocean.waterSurfaceY(),
+					"the main island stays above the water surface for seed " + seed + " (lowest ground y=" + min + ")");
+		}
+		helper.succeed();
+	}
+
+	private static int groundY(NoiseBasedChunkGenerator generator, ServerLevel end, RandomState randomState, int x, int z) {
+		// A heightmap height is the first y above the column's top block.
+		return generator.getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, end, randomState) - 1;
+	}
+
 	public static void assertProbeHandlesDryAndCappedColumns(GameTestHelper helper) {
 		ServerLevel level = helper.getLevel();
 		BlockPos origin = helper.absolutePos(new BlockPos(1, 1, 1));
@@ -112,29 +159,32 @@ public final class FloodedEndBehaviorAssertions {
 	public static void assertShipsMoorAtBothWaterlines(GameTestHelper helper) {
 		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
 		var generator = end.getChunkSource().getGenerator();
+		RandomState randomState = end.getChunkSource().randomState();
 		Structure.GenerationContext context = new Structure.GenerationContext(
-				end.registryAccess(), generator, generator.getBiomeSource(), end.getChunkSource().randomState(),
-				end.getStructureManager(), end.getSeed(), new ChunkPos(32, 32), end, biome -> true);
+				end.registryAccess(), generator, generator.getBiomeSource(),
+				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
+				end.getStructureTemplateManager(), end.getSeed(), new ChunkPos(32, 32), end, biome -> true);
 		for (Rotation rotation : Rotation.values()) {
 			for (EndOceanPreset preset : EndOceanPreset.PRESETS) {
-				var ship = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(512, 120, 512), rotation, true);
-				var tower = new EndCityPieces.EndCityPiece(end.getStructureManager(), "base_floor", new BlockPos(512, 64, 512), rotation, true);
+				var ship = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(512, 120, 512), rotation, true);
+				var tower = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "base_floor", new BlockPos(512, 64, 512), rotation, true);
 				BlockPos towerPosition = tower.templatePosition();
 				EndShipMooring.moor(context, List.of(ship, tower), new EndOcean(preset.seaLevel(), Blocks.WATER.defaultBlockState(), false));
 				helper.assertValueEqual(ship.getBoundingBox().minY(), preset.seaLevel() - 4, "ship keel follows the preset waterline");
 				helper.assertValueEqual(tower.templatePosition(), towerPosition, "mooring does not move city towers");
 			}
 		}
-		var outside = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(1024, 120, 1024), Rotation.NONE, true);
+		var outside = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(1024, 120, 1024), Rotation.NONE, true);
 		BlockPos position = outside.templatePosition();
 		EndShipMooring.moor(context, List.<StructurePiece>of(outside), EndOcean.of(end));
 		helper.assertValueEqual(outside.templatePosition(), position, "a ship with no placeable mooring stays at its original position");
 		var coast = new Structure.GenerationContext(end.registryAccess(), generator, generator.getBiomeSource(),
-				end.getChunkSource().randomState(), end.getStructureManager(), end.getSeed(), new ChunkPos(0, 0), end, biome -> true);
+				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
+				end.getStructureTemplateManager(), end.getSeed(), new ChunkPos(0, 0), end, biome -> true);
 		int moored = 0;
 		for (Rotation rotation : Rotation.values()) {
 			for (int x : new int[]{64, 96}) {
-				var ship = new EndCityPieces.EndCityPiece(end.getStructureManager(), "ship", new BlockPos(x, 120, 0), rotation, true);
+				var ship = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(x, 120, 0), rotation, true);
 				EndShipMooring.moor(coast, List.of(ship), EndOcean.of(end));
 				var hull = ship.getBoundingBox();
 				if (hull.minY() != 54) {
@@ -163,8 +213,8 @@ public final class FloodedEndBehaviorAssertions {
 		var flooded = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
 		var settings = flooded.generatorSettings().value();
 		var drySettings = new NoiseGeneratorSettings(settings.noiseSettings(), settings.defaultBlock(), Blocks.AIR.defaultBlockState(),
-				settings.noiseRouter(), settings.surfaceRule(), settings.spawnTarget(), 0, settings.disableMobGeneration(),
-				settings.aquifersEnabled(), settings.oreVeinsEnabled(), settings.useLegacyRandomSource());
+				settings.noiseRouter(), settings.materialRule(), settings.spawnTarget(), 0, settings.disableMobGeneration(),
+				settings.aquifers(), settings.useLegacyRandomSource(), settings.debugFunctions());
 		var dry = new NoiseBasedChunkGenerator(flooded.getBiomeSource(), Holder.direct(drySettings));
 		int ships = 0;
 		for (int seed = 0; seed < 16; seed++) {
@@ -182,7 +232,7 @@ public final class FloodedEndBehaviorAssertions {
 			helper.assertValueEqual(wet.size(), expected.size(), "flooding preserves the city's pieces");
 			for (int i = 0; i < wet.size(); i++) {
 				var piece = (net.minecraft.world.level.levelgen.structure.TemplateStructurePiece) wet.get(i);
-				if (piece.template() == end.getStructureManager().getOrCreate(Identifier.withDefaultNamespace("end_city/ship"))) {
+				if (piece.template() == end.getStructureTemplateManager().getOrCreate(Identifier.withDefaultNamespace("end_city/ship"))) {
 					ships++;
 				} else {
 					helper.assertValueEqual(piece.getBoundingBox().toString(), expected.get(i).getBoundingBox().toString(),
@@ -195,8 +245,10 @@ public final class FloodedEndBehaviorAssertions {
 	}
 
 	private static Structure.GenerationContext cityContext(ServerLevel end, ChunkGenerator generator, long seed) {
+		RandomState randomState = end.getChunkSource().randomState();
 		return new Structure.GenerationContext(end.registryAccess(), generator, generator.getBiomeSource(),
-				end.getChunkSource().randomState(), end.getStructureManager(), seed, new ChunkPos(0, 0), end, biome -> true);
+				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
+				end.getStructureTemplateManager(), seed, new ChunkPos(0, 0), end, biome -> true);
 	}
 
 

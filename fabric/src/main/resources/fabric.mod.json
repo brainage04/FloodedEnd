@@ -14,6 +14,9 @@
 	"license": "MIT",
 	"icon": "assets/floodedend/icon.png",
 	"environment": "*",
+	"mixins": [
+		"floodedend.mixins.json"
+	],
 	"entrypoints": {
 		"main": [
 			"io.github.brainage04.floodedend.fabric.FloodedEndFabric"
