@@ -1,6 +1,9 @@
 package io.github.brainage04.floodedend;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.JsonOps;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.commands.CommandSource;
@@ -11,9 +14,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -41,7 +46,9 @@ public final class FloodedEndBehaviorAssertions {
         CommandSourceStack source =
                 helper.getLevel().getServer().createCommandSourceStack().withSource(feedback);
         try {
-            command(source.withPermission(LevelBasedPermissionSet.ALL), "status");
+            command(
+                    source.withPermission(LevelBasedPermissionSet.forLevel(PermissionLevel.ALL)),
+                    "status");
             helper.fail(
                     "players without gamemaster permission must not execute FloodedEnd commands");
         } catch (CommandSyntaxException expected) {
@@ -338,19 +345,25 @@ public final class FloodedEndBehaviorAssertions {
                                 city.terrainAdaptation()));
         var flooded = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
         var settings = flooded.generatorSettings().value();
+        // The record's disableMobGeneration accessor is deprecated with no replacement
+        // (NoiseGeneratorSettings.java:32 in 26.3), so the dry copy goes through the codec, which
+        // still carries that field.
+        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, end.registryAccess());
+        JsonObject dryJson =
+                NoiseGeneratorSettings.DIRECT_CODEC
+                        .encodeStart(ops, settings)
+                        .getOrThrow(error -> new AssertionError("encode End settings: " + error))
+                        .getAsJsonObject();
+        dryJson.add(
+                "default_fluid",
+                BlockState.CODEC
+                        .encodeStart(ops, Blocks.AIR.defaultBlockState())
+                        .getOrThrow(error -> new AssertionError("encode air: " + error)));
+        dryJson.addProperty("sea_level", 0);
         var drySettings =
-                new NoiseGeneratorSettings(
-                        settings.noiseSettings(),
-                        settings.defaultBlock(),
-                        Blocks.AIR.defaultBlockState(),
-                        settings.noiseRouter(),
-                        settings.materialRule(),
-                        settings.spawnTarget(),
-                        0,
-                        settings.disableMobGeneration(),
-                        settings.aquifers(),
-                        settings.useLegacyRandomSource(),
-                        settings.debugFunctions());
+                NoiseGeneratorSettings.DIRECT_CODEC
+                        .parse(ops, dryJson)
+                        .getOrThrow(error -> new AssertionError("decode dry settings: " + error));
         var dry =
                 new NoiseBasedChunkGenerator(flooded.getBiomeSource(), Holder.direct(drySettings));
         int ships = 0;

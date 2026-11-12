@@ -10,6 +10,7 @@ import java.io.IOException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -217,7 +218,7 @@ public final class FloodedEndCommand {
 
         int x = position.getX();
         int z = position.getZ();
-        if (!end.hasChunkAt(new BlockPos(x, end.getMinY(), z))) {
+        if (!end.hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z))) {
             source.sendFailure(Component.literal("No End chunk loaded at " + x + ", " + z + "."));
             return 0;
         }
