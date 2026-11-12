@@ -31,255 +31,426 @@ import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityStructure;
 
 public final class FloodedEndBehaviorAssertions {
-	/** The seed of the world {@code docs/THE_END_UNDER_WATER.md} was measured in. */
-	private static final long DOCUMENTED_SEED = 1234567890L;
+    /** The seed of the world {@code docs/THE_END_UNDER_WATER.md} was measured in. */
+    private static final long DOCUMENTED_SEED = 1234567890L;
 
-	private FloodedEndBehaviorAssertions() {
-	}
+    private FloodedEndBehaviorAssertions() {}
 
-	public static void assertCommandsRespectPermissionsAndReportErrors(GameTestHelper helper) {
-		Feedback feedback = new Feedback();
-		CommandSourceStack source = helper.getLevel().getServer().createCommandSourceStack().withSource(feedback);
-		try {
-			command(source.withPermission(LevelBasedPermissionSet.ALL), "status");
-			helper.fail("players without gamemaster permission must not execute FloodedEnd commands");
-		} catch (CommandSyntaxException expected) {
-			// Brigadier must reject the command, not merely hide its suggestions.
-		}
-		try {
-			helper.assertValueEqual(command(source, "status"), 1, "the live End ocean is active");
-			helper.assertTrue(feedback.contains("End sea level 58, default fluid minecraft:water"), "status reads the live generator");
-			helper.assertValueEqual(command(source, "preset list"), 2, "both presets are listed");
-			helper.assertTrue(feedback.contains("moored") && feedback.contains("drowned"), "list names both presets");
-			helper.assertValueEqual(command(source, "preset apply unknown"), 0, "unknown presets fail");
-			helper.assertTrue(feedback.contains("Unknown FloodedEnd preset 'unknown'"), "unknown preset feedback is useful");
-			helper.assertValueEqual(command(source, "probe 29999984 29999984"), 0, "probing an unloaded chunk fails");
-			helper.assertTrue(feedback.contains("No End chunk loaded"), "probe explains unloaded chunks");
-		} catch (CommandSyntaxException error) {
-			throw new AssertionError("the registered commands must execute", error);
-		}
-		helper.succeed();
-	}
+    public static void assertCommandsRespectPermissionsAndReportErrors(GameTestHelper helper) {
+        Feedback feedback = new Feedback();
+        CommandSourceStack source =
+                helper.getLevel().getServer().createCommandSourceStack().withSource(feedback);
+        try {
+            command(source.withPermission(LevelBasedPermissionSet.ALL), "status");
+            helper.fail(
+                    "players without gamemaster permission must not execute FloodedEnd commands");
+        } catch (CommandSyntaxException expected) {
+            // Brigadier must reject the command, not merely hide its suggestions.
+        }
+        try {
+            helper.assertValueEqual(command(source, "status"), 1, "the live End ocean is active");
+            helper.assertTrue(
+                    feedback.contains("End sea level 58, default fluid minecraft:water"),
+                    "status reads the live generator");
+            helper.assertValueEqual(command(source, "preset list"), 2, "both presets are listed");
+            helper.assertTrue(
+                    feedback.contains("moored") && feedback.contains("drowned"),
+                    "list names both presets");
+            helper.assertValueEqual(
+                    command(source, "preset apply unknown"), 0, "unknown presets fail");
+            helper.assertTrue(
+                    feedback.contains("Unknown FloodedEnd preset 'unknown'"),
+                    "unknown preset feedback is useful");
+            helper.assertValueEqual(
+                    command(source, "probe 29999984 29999984"),
+                    0,
+                    "probing an unloaded chunk fails");
+            helper.assertTrue(
+                    feedback.contains("No End chunk loaded"), "probe explains unloaded chunks");
+        } catch (CommandSyntaxException error) {
+            throw new AssertionError("the registered commands must execute", error);
+        }
+        helper.succeed();
+    }
 
-	public static void assertGeneratedOceanAndProbe(GameTestHelper helper) {
-		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
-		helper.assertTrue(end != null, "the End is loaded");
-		// Inside the central void ring, away from the island and the arrival platform.
-		end.getChunk(32, 32);
-		EndOcean.Column column = EndOcean.probe(end, 512, 512);
-		helper.assertValueEqual(column.waterSurfaceY(), 57, "generated ocean surface");
-		helper.assertValueEqual(column.deepestWaterY(), 0, "generated ocean floor");
-		helper.assertValueEqual(column.waterBlocks(), 58, "the entire void column floods");
-		helper.assertTrue(end.getBlockState(new BlockPos(512, 58, 512)).isAir(), "blocks above the sea remain air");
-		Feedback feedback = new Feedback();
-		CommandSourceStack source = end.getServer().createCommandSourceStack().withSource(feedback)
-				.withPosition(new net.minecraft.world.phys.Vec3(512, 64, 512));
-		try {
-			helper.assertValueEqual(command(source, "probe"), 1, "probe uses the source's x/z in the End");
-			helper.assertValueEqual(command(source, "probe 512 512"), 1, "explicit probe coordinates work");
-			helper.assertTrue(feedback.contains("water 58 blocks from y=0 to y=57"), "probe describes real blocks");
-		} catch (CommandSyntaxException error) {
-			throw new AssertionError(error);
-		}
-		helper.succeed();
-	}
+    public static void assertGeneratedOceanAndProbe(GameTestHelper helper) {
+        ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
+        helper.assertTrue(end != null, "the End is loaded");
+        // Inside the central void ring, away from the island and the arrival platform.
+        end.getChunk(32, 32);
+        EndOcean.Column column = EndOcean.probe(end, 512, 512);
+        helper.assertValueEqual(column.waterSurfaceY(), 57, "generated ocean surface");
+        helper.assertValueEqual(column.deepestWaterY(), 0, "generated ocean floor");
+        helper.assertValueEqual(column.waterBlocks(), 58, "the entire void column floods");
+        helper.assertTrue(
+                end.getBlockState(new BlockPos(512, 58, 512)).isAir(),
+                "blocks above the sea remain air");
+        Feedback feedback = new Feedback();
+        CommandSourceStack source =
+                end.getServer()
+                        .createCommandSourceStack()
+                        .withSource(feedback)
+                        .withPosition(new net.minecraft.world.phys.Vec3(512, 64, 512));
+        try {
+            helper.assertValueEqual(
+                    command(source, "probe"), 1, "probe uses the source's x/z in the End");
+            helper.assertValueEqual(
+                    command(source, "probe 512 512"), 1, "explicit probe coordinates work");
+            helper.assertTrue(
+                    feedback.contains("water 58 blocks from y=0 to y=57"),
+                    "probe describes real blocks");
+        } catch (CommandSyntaxException error) {
+            throw new AssertionError(error);
+        }
+        helper.succeed();
+    }
 
-	/**
-	 * The shipped sea level must leave the main island dry. Measures the generated ground (the top non-fluid block)
-	 * within 40 blocks of the exit portal for this test world's seed and for the seed {@code THE_END_UNDER_WATER.md}
-	 * was measured with, straight from the End's noise, and logs the numbers the documentation quotes.
-	 */
-	public static void assertMainIslandStaysAboveTheWater(GameTestHelper helper) {
-		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
-		helper.assertTrue(end != null, "the End is loaded");
-		var generator = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
-		EndOcean ocean = EndOcean.of(end);
-		helper.assertTrue(ocean.flooded(), "the End generates its ocean");
-		for (long seed : new long[]{end.getSeed(), DOCUMENTED_SEED}) {
-			RandomState randomState = RandomState.create(end.registryAccess().lookupOrThrow(Registries.NOISE), seed,
-					generator.generatorSettings().value());
-			List<Integer> ground = new ArrayList<>();
-			for (int x = -40; x <= 40; x++) {
-				for (int z = -40; z <= 40; z++) {
-					if (x * x + z * z <= 40 * 40) {
-						ground.add(groundY(generator, end, randomState, x, z));
-					}
-				}
-			}
-			ground.sort(null);
-			int min = ground.getFirst();
-			int median = ground.get(ground.size() / 2);
-			int max = ground.getLast();
-			int portal = groundY(generator, end, randomState, 0, 0);
-			FloodedEnd.LOGGER.info("FloodedEnd main island ground within 40 blocks of the exit portal, seed {}: "
-					+ "min {}, median {}, max {}; ground at the portal {}; water surface {}",
-					seed, min, median, max, portal, ocean.waterSurfaceY());
-			helper.assertTrue(min > ocean.waterSurfaceY(),
-					"the main island stays above the water surface for seed " + seed + " (lowest ground y=" + min + ")");
-		}
-		helper.succeed();
-	}
+    /**
+     * The shipped sea level must leave the main island dry. Measures the generated ground (the top
+     * non-fluid block) within 40 blocks of the exit portal for this test world's seed and for the
+     * seed {@code THE_END_UNDER_WATER.md} was measured with, straight from the End's noise, and
+     * logs the numbers the documentation quotes.
+     */
+    public static void assertMainIslandStaysAboveTheWater(GameTestHelper helper) {
+        ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
+        helper.assertTrue(end != null, "the End is loaded");
+        var generator = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
+        EndOcean ocean = EndOcean.of(end);
+        helper.assertTrue(ocean.flooded(), "the End generates its ocean");
+        for (long seed : new long[] {end.getSeed(), DOCUMENTED_SEED}) {
+            RandomState randomState =
+                    RandomState.create(
+                            end.registryAccess().lookupOrThrow(Registries.NOISE),
+                            seed,
+                            generator.generatorSettings().value());
+            List<Integer> ground = new ArrayList<>();
+            for (int x = -40; x <= 40; x++) {
+                for (int z = -40; z <= 40; z++) {
+                    if (x * x + z * z <= 40 * 40) {
+                        ground.add(groundY(generator, end, randomState, x, z));
+                    }
+                }
+            }
+            ground.sort(null);
+            int min = ground.getFirst();
+            int median = ground.get(ground.size() / 2);
+            int max = ground.getLast();
+            int portal = groundY(generator, end, randomState, 0, 0);
+            FloodedEnd.LOGGER.info(
+                    "FloodedEnd main island ground within 40 blocks of the exit portal, seed {}: "
+                            + "min {}, median {}, max {}; ground at the portal {}; water surface {}",
+                    seed,
+                    min,
+                    median,
+                    max,
+                    portal,
+                    ocean.waterSurfaceY());
+            helper.assertTrue(
+                    min > ocean.waterSurfaceY(),
+                    "the main island stays above the water surface for seed "
+                            + seed
+                            + " (lowest ground y="
+                            + min
+                            + ")");
+        }
+        helper.succeed();
+    }
 
-	private static int groundY(NoiseBasedChunkGenerator generator, ServerLevel end, RandomState randomState, int x, int z) {
-		// A heightmap height is the first y above the column's top block.
-		return generator.getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, end, randomState) - 1;
-	}
+    private static int groundY(
+            NoiseBasedChunkGenerator generator,
+            ServerLevel end,
+            RandomState randomState,
+            int x,
+            int z) {
+        // A heightmap height is the first y above the column's top block.
+        return generator.getBaseHeight(x, z, Heightmap.Types.OCEAN_FLOOR_WG, end, randomState) - 1;
+    }
 
-	public static void assertProbeHandlesDryAndCappedColumns(GameTestHelper helper) {
-		ServerLevel level = helper.getLevel();
-		BlockPos origin = helper.absolutePos(new BlockPos(1, 1, 1));
-		List<BlockState> original = new ArrayList<>();
-		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(origin.getX(), 0, origin.getZ());
-		try {
-			for (int y = level.getMinY(); y < level.getMaxY(); y++) {
-				cursor.setY(y);
-				original.add(level.getBlockState(cursor));
-				level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 2);
-			}
-			level.setBlock(origin, Blocks.END_STONE.defaultBlockState(), 2);
-			EndOcean.Column dry = EndOcean.probe(level, origin.getX(), origin.getZ());
-			helper.assertTrue(!dry.isFlooded() && dry.describe().endsWith("; no water"), "dry columns report no water");
-			level.setBlock(origin.above(), Blocks.WATER.defaultBlockState(), 2);
-			level.setBlock(origin.above(3), Blocks.WATER.defaultBlockState(), 2);
-			level.setBlock(origin.above(4), Blocks.END_STONE.defaultBlockState(), 2);
-			EndOcean.Column capped = EndOcean.probe(level, origin.getX(), origin.getZ());
-			helper.assertValueEqual(capped.waterBlocks(), 2, "air gaps are not counted as water");
-			helper.assertValueEqual(capped.deepestWaterY(), origin.getY() + 1, "lowest water block");
-			helper.assertValueEqual(capped.waterSurfaceY(), origin.getY() + 3, "highest water block");
-			helper.assertValueEqual(capped.landY(), origin.getY() + 4, "solid cap is the highest non-water block");
-			helper.assertValueEqual(capped.surface(), "minecraft:end_stone", "solid cap is the surface");
-		} finally {
-			for (int i = 0; i < original.size(); i++) {
-				level.setBlock(cursor.set(origin.getX(), level.getMinY() + i, origin.getZ()), original.get(i), 2);
-			}
-		}
-		helper.succeed();
-	}
+    public static void assertProbeHandlesDryAndCappedColumns(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(1, 1, 1));
+        List<BlockState> original = new ArrayList<>();
+        BlockPos.MutableBlockPos cursor =
+                new BlockPos.MutableBlockPos(origin.getX(), 0, origin.getZ());
+        try {
+            for (int y = level.getMinY(); y < level.getMaxY(); y++) {
+                cursor.setY(y);
+                original.add(level.getBlockState(cursor));
+                level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 2);
+            }
+            level.setBlock(origin, Blocks.END_STONE.defaultBlockState(), 2);
+            EndOcean.Column dry = EndOcean.probe(level, origin.getX(), origin.getZ());
+            helper.assertTrue(
+                    !dry.isFlooded() && dry.describe().endsWith("; no water"),
+                    "dry columns report no water");
+            level.setBlock(origin.above(), Blocks.WATER.defaultBlockState(), 2);
+            level.setBlock(origin.above(3), Blocks.WATER.defaultBlockState(), 2);
+            level.setBlock(origin.above(4), Blocks.END_STONE.defaultBlockState(), 2);
+            EndOcean.Column capped = EndOcean.probe(level, origin.getX(), origin.getZ());
+            helper.assertValueEqual(capped.waterBlocks(), 2, "air gaps are not counted as water");
+            helper.assertValueEqual(
+                    capped.deepestWaterY(), origin.getY() + 1, "lowest water block");
+            helper.assertValueEqual(
+                    capped.waterSurfaceY(), origin.getY() + 3, "highest water block");
+            helper.assertValueEqual(
+                    capped.landY(), origin.getY() + 4, "solid cap is the highest non-water block");
+            helper.assertValueEqual(
+                    capped.surface(), "minecraft:end_stone", "solid cap is the surface");
+        } finally {
+            for (int i = 0; i < original.size(); i++) {
+                level.setBlock(
+                        cursor.set(origin.getX(), level.getMinY() + i, origin.getZ()),
+                        original.get(i),
+                        2);
+            }
+        }
+        helper.succeed();
+    }
 
-	public static void assertShipsMoorAtBothWaterlines(GameTestHelper helper) {
-		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
-		var generator = end.getChunkSource().getGenerator();
-		RandomState randomState = end.getChunkSource().randomState();
-		Structure.GenerationContext context = new Structure.GenerationContext(
-				end.registryAccess(), generator, generator.getBiomeSource(),
-				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
-				end.getStructureTemplateManager(), end.getSeed(), new ChunkPos(32, 32), end, biome -> true);
-		for (Rotation rotation : Rotation.values()) {
-			for (EndOceanPreset preset : EndOceanPreset.PRESETS) {
-				var ship = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(512, 120, 512), rotation, true);
-				var tower = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "base_floor", new BlockPos(512, 64, 512), rotation, true);
-				BlockPos towerPosition = tower.templatePosition();
-				EndShipMooring.moor(context, List.of(ship, tower), new EndOcean(preset.seaLevel(), Blocks.WATER.defaultBlockState(), false));
-				helper.assertValueEqual(ship.getBoundingBox().minY(), preset.seaLevel() - 4, "ship keel follows the preset waterline");
-				helper.assertValueEqual(tower.templatePosition(), towerPosition, "mooring does not move city towers");
-			}
-		}
-		var outside = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(1024, 120, 1024), Rotation.NONE, true);
-		BlockPos position = outside.templatePosition();
-		EndShipMooring.moor(context, List.<StructurePiece>of(outside), EndOcean.of(end));
-		helper.assertValueEqual(outside.templatePosition(), position, "a ship with no placeable mooring stays at its original position");
-		var coast = new Structure.GenerationContext(end.registryAccess(), generator, generator.getBiomeSource(),
-				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
-				end.getStructureTemplateManager(), end.getSeed(), new ChunkPos(0, 0), end, biome -> true);
-		int moored = 0;
-		for (Rotation rotation : Rotation.values()) {
-			for (int x : new int[]{64, 96}) {
-				var ship = new EndCityPieces.EndCityPiece(end.getStructureTemplateManager(), "ship", new BlockPos(x, 120, 0), rotation, true);
-				EndShipMooring.moor(coast, List.of(ship), EndOcean.of(end));
-				var hull = ship.getBoundingBox();
-				if (hull.minY() != 54) {
-					continue;
-				}
-				moored++;
-				for (int hullX = hull.minX(); hullX <= hull.maxX(); hullX++) {
-					for (int hullZ = hull.minZ(); hullZ <= hull.maxZ(); hullZ++) {
-						int ground = generator.getFirstOccupiedHeight(hullX, hullZ,
-								net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG, end, end.getChunkSource().randomState());
-						helper.assertTrue(ground <= 52, "every hull column clears the real seabed, including between old grid samples");
-					}
-				}
-			}
-		}
-		helper.assertTrue(moored > 0, "the shoreline samples include a moored ship");
-		helper.succeed();
-	}
+    public static void assertShipsMoorAtBothWaterlines(GameTestHelper helper) {
+        ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
+        var generator = end.getChunkSource().getGenerator();
+        RandomState randomState = end.getChunkSource().randomState();
+        Structure.GenerationContext context =
+                new Structure.GenerationContext(
+                        end.registryAccess(),
+                        generator,
+                        generator.getBiomeSource(),
+                        randomState.createClimateSampler(
+                                SamplerContext.builder().enableCaches().build()),
+                        randomState,
+                        end.getStructureTemplateManager(),
+                        end.getSeed(),
+                        new ChunkPos(32, 32),
+                        end,
+                        biome -> true);
+        for (Rotation rotation : Rotation.values()) {
+            for (EndOceanPreset preset : EndOceanPreset.PRESETS) {
+                var ship =
+                        new EndCityPieces.EndCityPiece(
+                                end.getStructureTemplateManager(),
+                                "ship",
+                                new BlockPos(512, 120, 512),
+                                rotation,
+                                true);
+                var tower =
+                        new EndCityPieces.EndCityPiece(
+                                end.getStructureTemplateManager(),
+                                "base_floor",
+                                new BlockPos(512, 64, 512),
+                                rotation,
+                                true);
+                BlockPos towerPosition = tower.templatePosition();
+                EndShipMooring.moor(
+                        context,
+                        List.of(ship, tower),
+                        new EndOcean(preset.seaLevel(), Blocks.WATER.defaultBlockState(), false));
+                helper.assertValueEqual(
+                        ship.getBoundingBox().minY(),
+                        preset.seaLevel() - 4,
+                        "ship keel follows the preset waterline");
+                helper.assertValueEqual(
+                        tower.templatePosition(),
+                        towerPosition,
+                        "mooring does not move city towers");
+            }
+        }
+        var outside =
+                new EndCityPieces.EndCityPiece(
+                        end.getStructureTemplateManager(),
+                        "ship",
+                        new BlockPos(1024, 120, 1024),
+                        Rotation.NONE,
+                        true);
+        BlockPos position = outside.templatePosition();
+        EndShipMooring.moor(context, List.<StructurePiece>of(outside), EndOcean.of(end));
+        helper.assertValueEqual(
+                outside.templatePosition(),
+                position,
+                "a ship with no placeable mooring stays at its original position");
+        var coast =
+                new Structure.GenerationContext(
+                        end.registryAccess(),
+                        generator,
+                        generator.getBiomeSource(),
+                        randomState.createClimateSampler(
+                                SamplerContext.builder().enableCaches().build()),
+                        randomState,
+                        end.getStructureTemplateManager(),
+                        end.getSeed(),
+                        new ChunkPos(0, 0),
+                        end,
+                        biome -> true);
+        int moored = 0;
+        for (Rotation rotation : Rotation.values()) {
+            for (int x : new int[] {64, 96}) {
+                var ship =
+                        new EndCityPieces.EndCityPiece(
+                                end.getStructureTemplateManager(),
+                                "ship",
+                                new BlockPos(x, 120, 0),
+                                rotation,
+                                true);
+                EndShipMooring.moor(coast, List.of(ship), EndOcean.of(end));
+                var hull = ship.getBoundingBox();
+                if (hull.minY() != 54) {
+                    continue;
+                }
+                moored++;
+                for (int hullX = hull.minX(); hullX <= hull.maxX(); hullX++) {
+                    for (int hullZ = hull.minZ(); hullZ <= hull.maxZ(); hullZ++) {
+                        int ground =
+                                generator.getFirstOccupiedHeight(
+                                        hullX,
+                                        hullZ,
+                                        net.minecraft.world.level.levelgen.Heightmap.Types
+                                                .OCEAN_FLOOR_WG,
+                                        end,
+                                        end.getChunkSource().randomState());
+                        helper.assertTrue(
+                                ground <= 52,
+                                "every hull column clears the real seabed, including between old grid samples");
+                    }
+                }
+            }
+        }
+        helper.assertTrue(moored > 0, "the shoreline samples include a moored ship");
+        helper.succeed();
+    }
 
-	public static void assertCityGenerationPreservesDryVanilla(GameTestHelper helper) {
-		ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
-		var city = (EndCityAtSea) end.registryAccess().lookupOrThrow(Registries.STRUCTURE)
-				.getOrThrow(ResourceKey.create(Registries.STRUCTURE, Identifier.withDefaultNamespace("end_city"))).value();
-		var vanilla = new EndCityStructure(new Structure.StructureSettings(
-				city.biomes(), city.spawnOverrides(), city.step(), city.terrainAdaptation()));
-		var flooded = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
-		var settings = flooded.generatorSettings().value();
-		var drySettings = new NoiseGeneratorSettings(settings.noiseSettings(), settings.defaultBlock(), Blocks.AIR.defaultBlockState(),
-				settings.noiseRouter(), settings.materialRule(), settings.spawnTarget(), 0, settings.disableMobGeneration(),
-				settings.aquifers(), settings.useLegacyRandomSource(), settings.debugFunctions());
-		var dry = new NoiseBasedChunkGenerator(flooded.getBiomeSource(), Holder.direct(drySettings));
-		int ships = 0;
-		for (int seed = 0; seed < 16; seed++) {
-			var expected = vanilla.findGenerationPoint(cityContext(end, dry, seed)).orElseThrow()
-					.getPiecesBuilder().build().pieces();
-			var actual = city.findGenerationPoint(cityContext(end, dry, seed)).orElseThrow()
-					.getPiecesBuilder().build().pieces();
-			helper.assertValueEqual(actual.size(), expected.size(), "dry End has vanilla's piece count");
-			for (int i = 0; i < expected.size(); i++) {
-				helper.assertValueEqual(actual.get(i).getBoundingBox().toString(), expected.get(i).getBoundingBox().toString(),
-						"dry End keeps every vanilla piece in place");
-			}
-			var wet = city.findGenerationPoint(cityContext(end, flooded, seed)).orElseThrow()
-					.getPiecesBuilder().build().pieces();
-			helper.assertValueEqual(wet.size(), expected.size(), "flooding preserves the city's pieces");
-			for (int i = 0; i < wet.size(); i++) {
-				var piece = (net.minecraft.world.level.levelgen.structure.TemplateStructurePiece) wet.get(i);
-				if (piece.template() == end.getStructureTemplateManager().getOrCreate(Identifier.withDefaultNamespace("end_city/ship"))) {
-					ships++;
-				} else {
-					helper.assertValueEqual(piece.getBoundingBox().toString(), expected.get(i).getBoundingBox().toString(),
-							"flooding does not move city buildings");
-				}
-			}
-		}
-		helper.assertTrue(ships > 0, "the deterministic city samples include ships");
-		helper.succeed();
-	}
+    public static void assertCityGenerationPreservesDryVanilla(GameTestHelper helper) {
+        ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
+        var city =
+                (EndCityAtSea)
+                        end.registryAccess()
+                                .lookupOrThrow(Registries.STRUCTURE)
+                                .getOrThrow(
+                                        ResourceKey.create(
+                                                Registries.STRUCTURE,
+                                                Identifier.withDefaultNamespace("end_city")))
+                                .value();
+        var vanilla =
+                new EndCityStructure(
+                        new Structure.StructureSettings(
+                                city.biomes(),
+                                city.spawnOverrides(),
+                                city.step(),
+                                city.terrainAdaptation()));
+        var flooded = (NoiseBasedChunkGenerator) end.getChunkSource().getGenerator();
+        var settings = flooded.generatorSettings().value();
+        var drySettings =
+                new NoiseGeneratorSettings(
+                        settings.noiseSettings(),
+                        settings.defaultBlock(),
+                        Blocks.AIR.defaultBlockState(),
+                        settings.noiseRouter(),
+                        settings.materialRule(),
+                        settings.spawnTarget(),
+                        0,
+                        settings.disableMobGeneration(),
+                        settings.aquifers(),
+                        settings.useLegacyRandomSource(),
+                        settings.debugFunctions());
+        var dry =
+                new NoiseBasedChunkGenerator(flooded.getBiomeSource(), Holder.direct(drySettings));
+        int ships = 0;
+        for (int seed = 0; seed < 16; seed++) {
+            var expected =
+                    vanilla.findGenerationPoint(cityContext(end, dry, seed))
+                            .orElseThrow()
+                            .getPiecesBuilder()
+                            .build()
+                            .pieces();
+            var actual =
+                    city.findGenerationPoint(cityContext(end, dry, seed))
+                            .orElseThrow()
+                            .getPiecesBuilder()
+                            .build()
+                            .pieces();
+            helper.assertValueEqual(
+                    actual.size(), expected.size(), "dry End has vanilla's piece count");
+            for (int i = 0; i < expected.size(); i++) {
+                helper.assertValueEqual(
+                        actual.get(i).getBoundingBox().toString(),
+                        expected.get(i).getBoundingBox().toString(),
+                        "dry End keeps every vanilla piece in place");
+            }
+            var wet =
+                    city.findGenerationPoint(cityContext(end, flooded, seed))
+                            .orElseThrow()
+                            .getPiecesBuilder()
+                            .build()
+                            .pieces();
+            helper.assertValueEqual(
+                    wet.size(), expected.size(), "flooding preserves the city's pieces");
+            for (int i = 0; i < wet.size(); i++) {
+                var piece =
+                        (net.minecraft.world.level.levelgen.structure.TemplateStructurePiece)
+                                wet.get(i);
+                if (piece.template()
+                        == end.getStructureTemplateManager()
+                                .getOrCreate(Identifier.withDefaultNamespace("end_city/ship"))) {
+                    ships++;
+                } else {
+                    helper.assertValueEqual(
+                            piece.getBoundingBox().toString(),
+                            expected.get(i).getBoundingBox().toString(),
+                            "flooding does not move city buildings");
+                }
+            }
+        }
+        helper.assertTrue(ships > 0, "the deterministic city samples include ships");
+        helper.succeed();
+    }
 
-	private static Structure.GenerationContext cityContext(ServerLevel end, ChunkGenerator generator, long seed) {
-		RandomState randomState = end.getChunkSource().randomState();
-		return new Structure.GenerationContext(end.registryAccess(), generator, generator.getBiomeSource(),
-				randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()), randomState,
-				end.getStructureTemplateManager(), seed, new ChunkPos(0, 0), end, biome -> true);
-	}
+    private static Structure.GenerationContext cityContext(
+            ServerLevel end, ChunkGenerator generator, long seed) {
+        RandomState randomState = end.getChunkSource().randomState();
+        return new Structure.GenerationContext(
+                end.registryAccess(),
+                generator,
+                generator.getBiomeSource(),
+                randomState.createClimateSampler(SamplerContext.builder().enableCaches().build()),
+                randomState,
+                end.getStructureTemplateManager(),
+                seed,
+                new ChunkPos(0, 0),
+                end,
+                biome -> true);
+    }
 
+    static int command(CommandSourceStack source, String arguments) throws CommandSyntaxException {
+        return source.getServer()
+                .getCommands()
+                .getDispatcher()
+                .execute("floodedend " + arguments, source);
+    }
 
-	static int command(CommandSourceStack source, String arguments) throws CommandSyntaxException {
-		return source.getServer().getCommands().getDispatcher().execute("floodedend " + arguments, source);
-	}
+    static final class Feedback implements CommandSource {
+        private final List<String> messages = new ArrayList<>();
 
-	static final class Feedback implements CommandSource {
-		private final List<String> messages = new ArrayList<>();
+        @Override
+        public void sendSystemMessage(Component message) {
+            messages.add(message.getString());
+        }
 
-		@Override
-		public void sendSystemMessage(Component message) {
-			messages.add(message.getString());
-		}
-		boolean contains(String text) {
-			return messages.stream().anyMatch(message -> message.contains(text));
-		}
+        boolean contains(String text) {
+            return messages.stream().anyMatch(message -> message.contains(text));
+        }
 
-		@Override
-		public boolean acceptsSuccess() {
-			return true;
-		}
+        @Override
+        public boolean acceptsSuccess() {
+            return true;
+        }
 
-		@Override
-		public boolean acceptsFailure() {
-			return true;
-		}
+        @Override
+        public boolean acceptsFailure() {
+            return true;
+        }
 
-		@Override
-		public boolean shouldInformAdmins() {
-			return false;
-		}
-	}
+        @Override
+        public boolean shouldInformAdmins() {
+            return false;
+        }
+    }
 }

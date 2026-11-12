@@ -10,104 +10,128 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 
 /**
- * Every value is read back out of the live dimension's chunk generator rather than duplicated in code, so a server
- * that did not load the shipped world generation data is reported as dry instead of silently assumed flooded.
+ * Every value is read back out of the live dimension's chunk generator rather than duplicated in
+ * code, so a server that did not load the shipped world generation data is reported as dry instead
+ * of silently assumed flooded.
  */
 public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) {
-	/** Water fills every y below the sea level, so the topmost water block sits one below it. */
-	public static final int SURFACE_BELOW_SEA_LEVEL = 1;
+    /** Water fills every y below the sea level, so the topmost water block sits one below it. */
+    public static final int SURFACE_BELOW_SEA_LEVEL = 1;
 
-	public static EndOcean of(ServerLevel level) {
-		return of(level.getChunkSource().getGenerator());
-	}
+    public static EndOcean of(ServerLevel level) {
+        return of(level.getChunkSource().getGenerator());
+    }
 
-	public static EndOcean of(ChunkGenerator generator) {
-		if (generator instanceof NoiseBasedChunkGenerator noise) {
-			NoiseGeneratorSettings settings = noise.generatorSettings().value();
-			return new EndOcean(settings.seaLevel(), settings.defaultFluid(), settings.aquifers().isPresent());
-		}
+    public static EndOcean of(ChunkGenerator generator) {
+        if (generator instanceof NoiseBasedChunkGenerator noise) {
+            NoiseGeneratorSettings settings = noise.generatorSettings().value();
+            return new EndOcean(
+                    settings.seaLevel(), settings.defaultFluid(), settings.aquifers().isPresent());
+        }
 
-		return new EndOcean(0, Blocks.AIR.defaultBlockState(), false);
-	}
+        return new EndOcean(0, Blocks.AIR.defaultBlockState(), false);
+    }
 
-	public boolean flooded() {
-		return seaLevel > 0 && fluid.is(Blocks.WATER);
-	}
+    public boolean flooded() {
+        return seaLevel > 0 && fluid.is(Blocks.WATER);
+    }
 
-	public int waterSurfaceY() {
-		return seaLevel - SURFACE_BELOW_SEA_LEVEL;
-	}
+    public int waterSurfaceY() {
+        return seaLevel - SURFACE_BELOW_SEA_LEVEL;
+    }
 
-	public String fluidName() {
-		return BuiltInRegistries.BLOCK.getKey(fluid.getBlock()).toString();
-	}
+    public String fluidName() {
+        return BuiltInRegistries.BLOCK.getKey(fluid.getBlock()).toString();
+    }
 
-	public String describe() {
-		return "End sea level " + seaLevel
-				+ ", default fluid " + fluidName()
-				+ ", aquifers " + (aquifersEnabled ? "enabled" : "disabled")
-				+ ", water surface y=" + waterSurfaceY();
-	}
+    public String describe() {
+        return "End sea level "
+                + seaLevel
+                + ", default fluid "
+                + fluidName()
+                + ", aquifers "
+                + (aquifersEnabled ? "enabled" : "disabled")
+                + ", water surface y="
+                + waterSurfaceY();
+    }
 
-	public static Column probe(ServerLevel level, int x, int z) {
-		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(x, 0, z);
-		int surfaceY = -1;
-		int waterSurfaceY = -1;
-		int deepestWaterY = -1;
-		int waterBlocks = 0;
-		int landY = -1;
-		BlockState surface = Blocks.AIR.defaultBlockState();
-		BlockState land = Blocks.AIR.defaultBlockState();
+    public static Column probe(ServerLevel level, int x, int z) {
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(x, 0, z);
+        int surfaceY = -1;
+        int waterSurfaceY = -1;
+        int deepestWaterY = -1;
+        int waterBlocks = 0;
+        int landY = -1;
+        BlockState surface = Blocks.AIR.defaultBlockState();
+        BlockState land = Blocks.AIR.defaultBlockState();
 
-		for (int y = level.getMinY(); y < level.getMaxY(); y++) {
-			BlockState state = level.getBlockState(cursor.set(x, y, z));
-			if (state.isAir()) {
-				continue;
-			}
+        for (int y = level.getMinY(); y < level.getMaxY(); y++) {
+            BlockState state = level.getBlockState(cursor.set(x, y, z));
+            if (state.isAir()) {
+                continue;
+            }
 
-			surfaceY = y;
-			surface = state;
+            surfaceY = y;
+            surface = state;
 
-			if (state.is(Blocks.WATER)) {
-				waterBlocks++;
-				deepestWaterY = deepestWaterY == -1 ? y : Math.min(deepestWaterY, y);
-				waterSurfaceY = y;
-			} else {
-				landY = y;
-				land = state;
-			}
-		}
+            if (state.is(Blocks.WATER)) {
+                waterBlocks++;
+                deepestWaterY = deepestWaterY == -1 ? y : Math.min(deepestWaterY, y);
+                waterSurfaceY = y;
+            } else {
+                landY = y;
+                land = state;
+            }
+        }
 
-		return new Column(x, z, surfaceY, name(surface), waterSurfaceY, deepestWaterY, waterBlocks, landY, name(land));
-	}
+        return new Column(
+                x,
+                z,
+                surfaceY,
+                name(surface),
+                waterSurfaceY,
+                deepestWaterY,
+                waterBlocks,
+                landY,
+                name(land));
+    }
 
-	private static String name(BlockState state) {
-		return BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
-	}
+    private static String name(BlockState state) {
+        return BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+    }
 
-	public record Column(
-			int x,
-			int z,
-			int surfaceY,
-			String surface,
-			int waterSurfaceY,
-			int deepestWaterY,
-			int waterBlocks,
-			int landY,
-			String land
-	) {
-		public boolean isFlooded() {
-			return waterBlocks > 0;
-		}
+    public record Column(
+            int x,
+            int z,
+            int surfaceY,
+            String surface,
+            int waterSurfaceY,
+            int deepestWaterY,
+            int waterBlocks,
+            int landY,
+            String land) {
+        public boolean isFlooded() {
+            return waterBlocks > 0;
+        }
 
-		public String describe() {
-			String column = "column (" + x + ", " + z + "): surface " + surface + " at y=" + surfaceY;
-			if (!isFlooded()) {
-				return column + "; no water";
-			}
+        public String describe() {
+            String column =
+                    "column (" + x + ", " + z + "): surface " + surface + " at y=" + surfaceY;
+            if (!isFlooded()) {
+                return column + "; no water";
+            }
 
-			return column + "; water " + waterBlocks + " blocks from y=" + deepestWaterY + " to y=" + waterSurfaceY
-					+ "; highest non-water block " + land + " at y=" + landY;
-		}
-	}
+            return column
+                    + "; water "
+                    + waterBlocks
+                    + " blocks from y="
+                    + deepestWaterY
+                    + " to y="
+                    + waterSurfaceY
+                    + "; highest non-water block "
+                    + land
+                    + " at y="
+                    + landY;
+        }
+    }
 }

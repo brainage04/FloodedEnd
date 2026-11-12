@@ -9,11 +9,15 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public final class FloodedEndFabric implements ModInitializer {
-	@Override
-	public void onInitialize() {
-		FloodedEnd.initialize();
-		Registry.register(BuiltInRegistries.STRUCTURE_TYPE, FloodedEnd.of(EndCityAtSea.NAME), EndCityAtSea.TYPE);
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-				FloodedEndCommand.register(dispatcher));
-	}
+    @Override
+    public void onInitialize() {
+        FloodedEnd.initialize();
+        Registry.register(
+                BuiltInRegistries.STRUCTURE_TYPE,
+                FloodedEnd.of(EndCityAtSea.NAME),
+                EndCityAtSea.TYPE);
+        CommandRegistrationCallback.EVENT.register(
+                (dispatcher, registryAccess, environment) ->
+                        FloodedEndCommand.register(dispatcher));
+    }
 }
