@@ -43,6 +43,13 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
     public static final List<EndOceanPreset> PRESETS = List.of(MOORED, DROWNED);
 
     public static final String DIRECTORY = "floodedend-preset";
+
+    /**
+     * A world's data pack folder is the pack {@code file/<folder>}
+     * (FolderRepositorySource.java:66).
+     */
+    public static final String PACK_ID = "file/" + DIRECTORY;
+
     private static final String OCEAN_RESOURCE = "/data/minecraft/worldgen/noise_settings/end.json";
     private static final String OCEAN_PATH = "data/minecraft/worldgen/noise_settings/end.json";
 
@@ -56,6 +63,19 @@ public record EndOceanPreset(String id, int seaLevel, String description) {
 
     public static boolean installed(MinecraftServer server) {
         return Files.isRegularFile(directory(server).resolve(OCEAN_PATH));
+    }
+
+    /**
+     * Whether {@code /datapack disable} switched the preset off. On the next start, vanilla adds
+     * new world data packs automatically unless they are on this list
+     * (MinecraftServer.java:1568-1576), so a disabled preset stays off however often it is applied.
+     */
+    public static boolean disabled(MinecraftServer server) {
+        return server.getWorldData()
+                .getDataConfiguration()
+                .dataPacks()
+                .getDisabled()
+                .contains(PACK_ID);
     }
 
     public void install(MinecraftServer server) throws IOException {

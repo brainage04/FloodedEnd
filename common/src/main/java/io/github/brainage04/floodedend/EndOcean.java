@@ -22,14 +22,28 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
         return of(level.getChunkSource().getGenerator());
     }
 
+    /**
+     * The ocean of a generator that builds its terrain from the {@code minecraft:end} noise
+     * settings, the settings FloodedEnd floods. That is vanilla's own test for its End ({@code
+     * WorldDimensions.isStableEnd}, {@code WorldDimensions.java:146-151} in 26.3), and it also
+     * holds for a datapack dimension that reuses those settings. Any other generator has no End
+     * ocean, even one that places End biomes over water, such as the Single Biome world type set to
+     * an End biome, which generates from the Overworld's settings ({@code WorldPresets.java:150}).
+     */
     public static EndOcean of(ChunkGenerator generator) {
-        if (generator instanceof NoiseBasedChunkGenerator noise) {
-            NoiseGeneratorSettings settings = noise.generatorSettings().value();
+        if (generatesFromEndSettings(generator)) {
+            NoiseGeneratorSettings settings =
+                    ((NoiseBasedChunkGenerator) generator).generatorSettings().value();
             return new EndOcean(
                     settings.seaLevel(), settings.defaultFluid(), settings.aquifers().isPresent());
         }
 
         return new EndOcean(0, Blocks.AIR.defaultBlockState(), false);
+    }
+
+    public static boolean generatesFromEndSettings(ChunkGenerator generator) {
+        return generator instanceof NoiseBasedChunkGenerator noise
+                && noise.stable(NoiseGeneratorSettings.END);
     }
 
     public boolean flooded() {

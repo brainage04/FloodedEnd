@@ -34,4 +34,12 @@ public final class FloodedEndNeoForgeGameTests {
     public void mainIslandStaysAboveTheWater(GameTestHelper helper) {
         FloodedEndBehaviorAssertions.assertMainIslandStaysAboveTheWater(helper);
     }
+
+    public void endCityOutsideTheEndStaysVanilla(GameTestHelper helper) {
+        FloodedEndGenerationAssertions.assertEndCityOutsideTheEndStaysVanilla(helper);
+    }
+
+    public void shippedEndSettingsFollowVanilla(GameTestHelper helper) {
+        FloodedEndGenerationAssertions.assertShippedEndSettingsFollowVanilla(helper);
+    }
 }

@@ -46,5 +46,13 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 BuiltInRegistries.TEST_FUNCTION.key(),
                 FloodedEnd.of("main_island_stays_above_the_water"),
                 () -> tests::mainIslandStaysAboveTheWater);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("end_city_outside_the_end_stays_vanilla"),
+                () -> tests::endCityOutsideTheEndStaysVanilla);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("shipped_end_settings_follow_vanilla"),
+                () -> tests::shippedEndSettingsFollowVanilla);
     }
 }

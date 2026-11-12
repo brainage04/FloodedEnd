@@ -69,7 +69,8 @@ public final class EndShipMooring {
     /**
      * Where a moved ship may end up. A chunk only places the pieces of a structure start within
      * {@link ChunkStatus#MAX_STRUCTURE_DISTANCE} chunks of it, so a ship pushed further than that
-     * would be placed only as far as the radius reaches and would stand in the world half built.
+     * would be placed only as far as the radius reaches and would stand in the world half built. A
+     * hull above the build height would be cut off the same way.
      */
     private static BoundingBox placeableArea(Structure.GenerationContext context) {
         ChunkPos chunk = context.chunkPos();
@@ -88,6 +89,8 @@ public final class EndShipMooring {
     private static boolean inside(BoundingBox area, BoundingBox box) {
         return box.minX() >= area.minX()
                 && box.maxX() <= area.maxX()
+                && box.minY() >= area.minY()
+                && box.maxY() <= area.maxY()
                 && box.minZ() >= area.minZ()
                 && box.maxZ() <= area.maxZ();
     }
@@ -106,7 +109,7 @@ public final class EndShipMooring {
                         continue;
                     }
 
-                    BoundingBox moved = hull.moved(dx, 0, dz);
+                    BoundingBox moved = hull.moved(dx, keelY - origin.getY(), dz);
                     if (inside(area, moved) && floats(context, seabed, moved, keelY)) {
                         return Optional.of(origin.offset(dx, keelY - origin.getY(), dz));
                     }

@@ -43,4 +43,14 @@ public final class FloodedEndGameTest {
     public void mainIslandStaysAboveTheWater(GameTestHelper helper) {
         FloodedEndBehaviorAssertions.assertMainIslandStaysAboveTheWater(helper);
     }
+
+    @GameTest
+    public void endCityOutsideTheEndStaysVanilla(GameTestHelper helper) {
+        FloodedEndGenerationAssertions.assertEndCityOutsideTheEndStaysVanilla(helper);
+    }
+
+    @GameTest
+    public void shippedEndSettingsFollowVanilla(GameTestHelper helper) {
+        FloodedEndGenerationAssertions.assertShippedEndSettingsFollowVanilla(helper);
+    }
 }

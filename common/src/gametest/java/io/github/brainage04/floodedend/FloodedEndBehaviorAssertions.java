@@ -37,7 +37,7 @@ import net.minecraft.world.level.levelgen.structure.structures.EndCityStructure;
 
 public final class FloodedEndBehaviorAssertions {
     /** The seed of the world {@code docs/THE_END_UNDER_WATER.md} was measured in. */
-    private static final long DOCUMENTED_SEED = 1234567890L;
+    static final long DOCUMENTED_SEED = 1234567890L;
 
     private FloodedEndBehaviorAssertions() {}
 
@@ -57,8 +57,25 @@ public final class FloodedEndBehaviorAssertions {
         try {
             helper.assertValueEqual(command(source, "status"), 1, "the live End ocean is active");
             helper.assertTrue(
-                    feedback.contains("End sea level 58, default fluid minecraft:water"),
+                    feedback.contains(
+                            "minecraft:the_end: End sea level 58, default fluid minecraft:water"),
                     "status reads the live generator");
+            helper.assertValueEqual(
+                    EndOceanPreset.MOORED.seaLevel(),
+                    EndOcean.of(helper.getLevel().getServer().getLevel(Level.END)).seaLevel(),
+                    "the moored preset is the shipped ocean");
+            helper.assertValueEqual(
+                    command(source, "status minecraft:the_end"),
+                    1,
+                    "status takes the dimension to report");
+            helper.assertValueEqual(
+                    command(source, "status minecraft:overworld"),
+                    0,
+                    "a dimension that does not generate from the End's settings has no End ocean");
+            helper.assertTrue(
+                    feedback.contains(
+                            "minecraft:overworld does not generate from the minecraft:end noise settings"),
+                    "status names the dimension it rejects");
             helper.assertValueEqual(command(source, "preset list"), 2, "both presets are listed");
             helper.assertTrue(
                     feedback.contains("moored") && feedback.contains("drowned"),
@@ -73,7 +90,8 @@ public final class FloodedEndBehaviorAssertions {
                     0,
                     "probing an unloaded chunk fails");
             helper.assertTrue(
-                    feedback.contains("No End chunk loaded"), "probe explains unloaded chunks");
+                    feedback.contains("No minecraft:the_end chunk loaded"),
+                    "probe explains unloaded chunks");
         } catch (CommandSyntaxException error) {
             throw new AssertionError("the registered commands must execute", error);
         }
@@ -97,15 +115,38 @@ public final class FloodedEndBehaviorAssertions {
                 end.getServer()
                         .createCommandSourceStack()
                         .withSource(feedback)
+                        .withLevel(end)
                         .withPosition(new net.minecraft.world.phys.Vec3(512, 64, 512));
+        BlockPos here = helper.absolutePos(BlockPos.ZERO);
+        CommandSourceStack elsewhere =
+                source.withLevel(helper.getLevel())
+                        .withPosition(net.minecraft.world.phys.Vec3.atCenterOf(here));
         try {
             helper.assertValueEqual(
                     command(source, "probe"), 1, "probe uses the source's x/z in the End");
             helper.assertValueEqual(
                     command(source, "probe 512 512"), 1, "explicit probe coordinates work");
             helper.assertTrue(
-                    feedback.contains("water 58 blocks from y=0 to y=57"),
+                    feedback.contains(
+                            "minecraft:the_end column (512, 512): surface minecraft:water at y=57; water 58 blocks from y=0 to y=57"),
                     "probe describes real blocks");
+            helper.assertValueEqual(
+                    command(elsewhere, "probe"),
+                    0,
+                    "without coordinates, probe reads the source's own dimension");
+            helper.assertTrue(
+                    feedback.contains(
+                            helper.getLevel().dimension().identifier()
+                                    + " column ("
+                                    + here.getX()
+                                    + ", "
+                                    + here.getZ()
+                                    + ")"),
+                    "probe names the dimension it read");
+            helper.assertValueEqual(
+                    command(elsewhere, "probe 512 512 minecraft:the_end"),
+                    1,
+                    "probe takes the dimension to read");
         } catch (CommandSyntaxException error) {
             throw new AssertionError(error);
         }
@@ -275,6 +316,22 @@ public final class FloodedEndBehaviorAssertions {
                 outside.templatePosition(),
                 position,
                 "a ship with no placeable mooring stays at its original position");
+        var aboveBuildHeight =
+                new EndCityPieces.EndCityPiece(
+                        end.getStructureTemplateManager(),
+                        "ship",
+                        new BlockPos(512, 120, 512),
+                        Rotation.NONE,
+                        true);
+        BlockPos skyPosition = aboveBuildHeight.templatePosition();
+        EndShipMooring.moor(
+                context,
+                List.<StructurePiece>of(aboveBuildHeight),
+                new EndOcean(250, Blocks.WATER.defaultBlockState(), false));
+        helper.assertValueEqual(
+                aboveBuildHeight.templatePosition(),
+                skyPosition,
+                "a ship whose moored hull would reach above the build height stays where it is");
         var coast =
                 new Structure.GenerationContext(
                         end.registryAccess(),

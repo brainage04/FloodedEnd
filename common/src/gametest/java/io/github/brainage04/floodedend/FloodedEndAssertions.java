@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +20,11 @@ import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.world.level.DataPackConfig;
+import net.minecraft.world.level.WorldDataConfiguration;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.storage.WorldData;
 
 public final class FloodedEndAssertions {
     private FloodedEndAssertions() {}
@@ -81,6 +85,34 @@ public final class FloodedEndAssertions {
             helper.assertTrue(
                     feedback.contains("Restart the server"),
                     "apply explains when world generation changes");
+            helper.assertTrue(
+                    !feedback.contains("installed but disabled")
+                            && !feedback.contains("/datapack enable"),
+                    "an enabled preset is not reported disabled");
+            WorldData worldData = server.getWorldData();
+            WorldDataConfiguration original = worldData.getDataConfiguration();
+            List<String> disabled = new ArrayList<>(original.dataPacks().getDisabled());
+            disabled.add("file/floodedend-preset");
+            worldData.setDataConfiguration(
+                    new WorldDataConfiguration(
+                            new DataPackConfig(original.dataPacks().getEnabled(), disabled),
+                            original.enabledFeatures()));
+            try {
+                helper.assertValueEqual(
+                        FloodedEndBehaviorAssertions.command(source, "preset apply moored"),
+                        1,
+                        "apply still writes a disabled preset");
+                helper.assertTrue(
+                        feedback.contains("/datapack enable \"file/floodedend-preset\""),
+                        "apply says how to enable a preset that /datapack disable switched off");
+                FloodedEndBehaviorAssertions.command(source, "preset list");
+                helper.assertTrue(
+                        feedback.contains(
+                                "this world's preset data pack is installed but disabled"),
+                        "list reports a disabled preset");
+            } finally {
+                worldData.setDataConfiguration(original);
+            }
             helper.assertValueEqual(
                     FloodedEndBehaviorAssertions.command(source, "preset clear"),
                     1,
