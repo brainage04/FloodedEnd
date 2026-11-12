@@ -65,9 +65,14 @@ FloodedEnd changes world generation, so it only affects End chunks generated whi
 - End chunks generated before it was installed stay dry. Where a new, flooded chunk meets an old one, the water
   stands as a wall at the chunk border, because the End generates without aquifers and its water gets no fluid
   updates. The wall flows into the dry chunk when a block next to it is updated.
-- End cities generated before it was installed keep their ships in the sky.
+- End cities whose position was decided before it was installed keep their ships in the sky. Minecraft decides
+  structure positions up to 8 chunks ahead of the terrain it generates, so such cities also stand in newly flooded
+  chunks up to about 8 chunks (128 blocks) beyond the End chunks generated before the install.
 - Removing the mod leaves the water in every chunk generated while it was installed. Chunks generated afterwards
-  are dry again.
+  are dry again, unless a preset was applied with `/floodedend preset apply`. The preset data pack works without the
+  mod, so it keeps flooding new End chunks, and the End cities there get vanilla placement with their ships in the
+  sky. Run `/floodedend preset clear`, or delete `datapacks/floodedend-preset` from the world, before removing the
+  mod.
 
 For a fully flooded End, install it in a new world or in a world whose End has not been explored.
 
@@ -107,8 +112,8 @@ Both are described in the [Underwater End notes](docs/THE_END_UNDER_WATER.md#kno
 
 ## Documentation
 
-- [Underwater End notes](docs/THE_END_UNDER_WATER.md) - terrain measurements, ship placement and dragon fight observations.
-- [Development](docs/DEVELOPMENT.md) - building and GameTests.
+- [Underwater End notes](docs/THE_END_UNDER_WATER.md) – terrain measurements, ship placement and dragon fight observations.
+- [Development](docs/DEVELOPMENT.md) – building and GameTests.
 - [Release automation](docs/RELEASE.md)
 - [Modrinth publishing](docs/MODRINTH.md)
 
