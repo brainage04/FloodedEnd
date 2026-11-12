@@ -1,5 +1,6 @@
 package io.github.brainage04.floodedend;
 
+import java.util.OptionalInt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
@@ -71,15 +72,16 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
 
     public static Column probe(ServerLevel level, int x, int z) {
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(x, 0, z);
-        int surfaceY = -1;
-        int waterSurfaceY = -1;
-        int deepestWaterY = -1;
+        int none = level.getMinY() - 1;
+        int surfaceY = none;
+        int waterSurfaceY = none;
+        int deepestWaterY = none;
         int waterBlocks = 0;
-        int landY = -1;
+        int landY = none;
         BlockState surface = Blocks.AIR.defaultBlockState();
         BlockState land = Blocks.AIR.defaultBlockState();
 
-        for (int y = level.getMinY(); y < level.getMaxY(); y++) {
+        for (int y = level.getMinY(); y <= level.getMaxY(); y++) {
             BlockState state = level.getBlockState(cursor.set(x, y, z));
             if (state.isAir()) {
                 continue;
@@ -89,8 +91,10 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
             surface = state;
 
             if (state.is(Blocks.WATER)) {
+                if (waterBlocks == 0) {
+                    deepestWaterY = y;
+                }
                 waterBlocks++;
-                deepestWaterY = deepestWaterY == -1 ? y : Math.min(deepestWaterY, y);
                 waterSurfaceY = y;
             } else {
                 landY = y;
@@ -101,13 +105,17 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
         return new Column(
                 x,
                 z,
-                surfaceY,
+                found(surfaceY, none),
                 name(surface),
-                waterSurfaceY,
-                deepestWaterY,
+                found(waterSurfaceY, none),
+                found(deepestWaterY, none),
                 waterBlocks,
-                landY,
+                found(landY, none),
                 name(land));
+    }
+
+    private static OptionalInt found(int y, int none) {
+        return y == none ? OptionalInt.empty() : OptionalInt.of(y);
     }
 
     private static String name(BlockState state) {
@@ -117,12 +125,12 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
     public record Column(
             int x,
             int z,
-            int surfaceY,
+            OptionalInt surfaceY,
             String surface,
-            int waterSurfaceY,
-            int deepestWaterY,
+            OptionalInt waterSurfaceY,
+            OptionalInt deepestWaterY,
             int waterBlocks,
-            int landY,
+            OptionalInt landY,
             String land) {
         public boolean isFlooded() {
             return waterBlocks > 0;
@@ -130,7 +138,14 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
 
         public String describe() {
             String column =
-                    "column (" + x + ", " + z + "): surface " + surface + " at y=" + surfaceY;
+                    "column ("
+                            + x
+                            + ", "
+                            + z
+                            + "): "
+                            + (surfaceY.isPresent()
+                                    ? "surface " + surface + " at y=" + surfaceY.getAsInt()
+                                    : "only air");
             if (!isFlooded()) {
                 return column + "; no water";
             }
@@ -139,13 +154,13 @@ public record EndOcean(int seaLevel, BlockState fluid, boolean aquifersEnabled) 
                     + "; water "
                     + waterBlocks
                     + " blocks from y="
-                    + deepestWaterY
+                    + deepestWaterY.getAsInt()
                     + " to y="
-                    + waterSurfaceY
-                    + "; highest non-water block "
-                    + land
-                    + " at y="
-                    + landY;
+                    + waterSurfaceY.getAsInt()
+                    + "; "
+                    + (landY.isPresent()
+                            ? "highest non-water block " + land + " at y=" + landY.getAsInt()
+                            : "no non-water block");
         }
     }
 }

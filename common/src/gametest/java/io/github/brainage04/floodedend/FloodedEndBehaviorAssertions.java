@@ -6,6 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.JsonOps;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -104,8 +105,9 @@ public final class FloodedEndBehaviorAssertions {
         // Inside the central void ring, away from the island and the arrival platform.
         end.getChunk(32, 32);
         EndOcean.Column column = EndOcean.probe(end, 512, 512);
-        helper.assertValueEqual(column.waterSurfaceY(), 57, "generated ocean surface");
-        helper.assertValueEqual(column.deepestWaterY(), 0, "generated ocean floor");
+        helper.assertValueEqual(
+                column.waterSurfaceY(), OptionalInt.of(57), "generated ocean surface");
+        helper.assertValueEqual(column.deepestWaterY(), OptionalInt.of(0), "generated ocean floor");
         helper.assertValueEqual(column.waterBlocks(), 58, "the entire void column floods");
         helper.assertTrue(
                 end.getBlockState(new BlockPos(512, 58, 512)).isAir(),
@@ -221,11 +223,34 @@ public final class FloodedEndBehaviorAssertions {
         BlockPos.MutableBlockPos cursor =
                 new BlockPos.MutableBlockPos(origin.getX(), 0, origin.getZ());
         try {
-            for (int y = level.getMinY(); y < level.getMaxY(); y++) {
+            for (int y = level.getMinY(); y <= level.getMaxY(); y++) {
                 cursor.setY(y);
                 original.add(level.getBlockState(cursor));
                 level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 2);
             }
+            helper.assertTrue(level.getMinY() < -1, "the test level builds below y=-1");
+            int top = level.getMaxY();
+            int[] waterYs = {-1, 0, top};
+            for (int y : waterYs) {
+                level.setBlock(cursor.setY(y), Blocks.WATER.defaultBlockState(), 2);
+            }
+            String waterOnly = EndOcean.probe(level, origin.getX(), origin.getZ()).describe();
+            for (int y : waterYs) {
+                level.setBlock(cursor.setY(y), Blocks.AIR.defaultBlockState(), 2);
+            }
+            String airOnly = EndOcean.probe(level, origin.getX(), origin.getZ()).describe();
+            String column = "column (" + origin.getX() + ", " + origin.getZ() + "): ";
+            helper.assertValueEqual(
+                    List.of(waterOnly, airOnly),
+                    List.of(
+                            column
+                                    + "surface minecraft:water at y="
+                                    + top
+                                    + "; water 3 blocks from y=-1 to y="
+                                    + top
+                                    + "; no non-water block",
+                            column + "only air; no water"),
+                    "the probe of water at y=-1, y=0 and the top build layer, then of air only");
             level.setBlock(origin, Blocks.END_STONE.defaultBlockState(), 2);
             EndOcean.Column dry = EndOcean.probe(level, origin.getX(), origin.getZ());
             helper.assertTrue(
@@ -237,11 +262,17 @@ public final class FloodedEndBehaviorAssertions {
             EndOcean.Column capped = EndOcean.probe(level, origin.getX(), origin.getZ());
             helper.assertValueEqual(capped.waterBlocks(), 2, "air gaps are not counted as water");
             helper.assertValueEqual(
-                    capped.deepestWaterY(), origin.getY() + 1, "lowest water block");
+                    capped.deepestWaterY(),
+                    OptionalInt.of(origin.getY() + 1),
+                    "lowest water block");
             helper.assertValueEqual(
-                    capped.waterSurfaceY(), origin.getY() + 3, "highest water block");
+                    capped.waterSurfaceY(),
+                    OptionalInt.of(origin.getY() + 3),
+                    "highest water block");
             helper.assertValueEqual(
-                    capped.landY(), origin.getY() + 4, "solid cap is the highest non-water block");
+                    capped.landY(),
+                    OptionalInt.of(origin.getY() + 4),
+                    "solid cap is the highest non-water block");
             helper.assertValueEqual(
                     capped.surface(), "minecraft:end_stone", "solid cap is the surface");
         } finally {
