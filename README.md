@@ -75,14 +75,14 @@ For a fully flooded End, install it in a new world or in a world whose End has n
 
 All commands require gamemaster permission (level 2).
 
-- `/floodedend status [dimension]` - reports a dimension's live sea level and default fluid (the End by default), and
+- `/floodedend status [dimension]` – reports a dimension's live sea level and default fluid (the End by default), and
   fails if it has no active ocean.
-- `/floodedend probe [x z [dimension]]` - reads a loaded column: its surface block, water depth and highest non-water
-  block. Without coordinates it reads where you stand; with coordinates it reads the End unless a dimension is given.
-- `/floodedend preset list` - lists the presets and the live ocean settings, and says whether the preset data pack is
+- `/floodedend probe [x z [dimension]]` – reads a loaded column: its surface block, water depth and highest non-water
+  block. Without coordinates it reads where you stand. With coordinates it reads the End unless a dimension is given.
+- `/floodedend preset list` – lists the presets and the live ocean settings, and says whether the preset data pack is
   installed, and whether `/datapack disable` turned it off.
-- `/floodedend preset apply <moored|drowned>` - installs a sea-level preset for the next server start.
-- `/floodedend preset clear` - removes the installed preset for the next server start.
+- `/floodedend preset apply <moored|drowned>` – installs a sea-level preset for the next server start.
+- `/floodedend preset clear` – removes the installed preset for the next server start.
 
 ## Configuration
 
