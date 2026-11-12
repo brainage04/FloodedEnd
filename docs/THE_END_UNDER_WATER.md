@@ -99,12 +99,29 @@ placement chunk's eight-chunk neighbourhood.
 ever needs – the ships of a watched world moved between 1 and 14 blocks to find water – and it keeps a moored ship
 close to the city it belongs to.
 
-One generated world still shows a residue of the earlier, wider search: a 174-block bow of an End ship stands at
-(-1728, 54, 45) with no matching structure start in the save, while the same city's complete ship is a hundred blocks
-away. The fragment is unchanged by the reach (identical at 48 and 128 blocks) and by a regeneration in which each
-city's structure start chunk was generated before its neighbours, so it is not the mooring alone; the End cities the
-delivered captures were shot around all carry complete 929-block ships.
+## Known ship defects
 
+### Small End islands in a hull
+
+The `small_end_islands` biome places `minecraft:end_island_decorated`, small islands of end stone between y=55 and
+y=70, in the first generation step. They are features, so the terrain height that the mooring reads does not include
+them. An island placed from a neighbouring chunk after the ship's own chunk was decorated replaces hull blocks with
+end stone, and which of the two chunks is decorated first changes from run to run.
+
+A diagnostic GameTest switched structure generation on in the GameTest world (seed 0), generated the chunks under five
+moored ships and compared 898 hull blocks of each with the ship template. Over three runs, three ships were whole every
+time, one lost 2, 2 and 0 blocks, and one lost 37, 37 and 50. Four of the five hulls lie over `small_end_islands`,
+so keeping ships away from that biome would leave most of them in the sky.
+
+### A lone bow in a 26.2 world
+
+One world generated on Minecraft 26.2 has a 174-block bow of an End ship at (-1728, 54, 45) with no matching
+structure start in the save, while the same city's complete ship is a hundred blocks away. The fragment was unchanged
+by the reach (identical at 48 and 128 blocks) and by a regeneration in which each city's structure start chunk was
+generated before its neighbours. Its cause is unknown. On 26.3 the nearest End city of that seed, at chunk (-115, 1),
+gave the same pieces in two computations and moors its ship at x=-1729 to -1701, z=27 to 39. The hull's farthest chunk is
+8 chunks from the start chunk, inside the reference radius. The End cities the delivered captures were shot around all
+carry complete 929-block ships.
 
 ## Not in this release
 
