@@ -111,8 +111,8 @@ public final class FloodedEndAssertions {
      * A preset applied under Minecraft 26.2 holds 26.2's noise settings, which 26.3 cannot decode;
      * a world carrying it fails to load ("Failed to load datapacks, can't proceed with server
      * load"). The mod rewrites such a pack before the world's data packs are read and keeps its sea
-     * level. Both metadata shapes 26.2 builds wrote are covered: {@code pack_format} only
-     * (FloodedEnd 1.0.0 as released) and with {@code min_format}/{@code max_format}.
+     * level. Both metadata shapes 26.2 builds wrote are covered: {@code pack_format} only (the
+     * first 26.2 build) and with {@code min_format}/{@code max_format}.
      */
     public static void assertStalePresetIsUpgradedBeforeLoading(GameTestHelper helper) {
         RegistryOps<JsonElement> ops =
