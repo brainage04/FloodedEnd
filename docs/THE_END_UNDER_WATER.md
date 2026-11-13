@@ -117,8 +117,9 @@ so keeping ships away from that biome would leave most of them in the sky.
 
 FloodedEnd now keeps the island out of every structure piece around its own chunk: the island reads the pieces of the
 structure starts within `ChunkStatus.MAX_STRUCTURE_DISTANCE` chunks, the same bound that keeps a moored ship inside its
-city's neighbourhood, and skips a block that lies inside one of them. The island keeps growing outside the pieces, so
-an island next to a ship stands against its hull instead of replacing it. The GameTest
+city's neighbourhood, and skips a block that lies inside one of them. The island keeps growing outside the boxes, so
+an island next to a ship stops at the piece's bounding box instead of replacing it. The box is the whole piece, air
+included, so an island that overlaps an empty corner of a ship's box is cut straight off there. The GameTest
 `small_end_islands_keep_out_of_ships` puts vanilla's ship template in the End, registers it as a structure start of
 that chunk the way a generated city's ship is, grows vanilla's island feature over it and checks that no block of the
 ship changed.

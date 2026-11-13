@@ -58,5 +58,9 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 BuiltInRegistries.TEST_FUNCTION.key(),
                 FloodedEnd.of("shipped_end_settings_follow_vanilla"),
                 () -> tests::shippedEndSettingsFollowVanilla);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("offset_island_skips_chunks_the_region_cannot_serve"),
+                () -> tests::offsetIslandSkipsChunksTheRegionCannotServe);
     }
 }

@@ -31,6 +31,11 @@ public final class EndIslandStructures {
      * which is the bound vanilla's structure placement uses and the one {@link EndShipMooring}
      * keeps a moored ship inside, so this neighbourhood holds every piece an island can reach.
      */
+    // hasChunk is deprecated with the rest of LevelReader's presence checks
+    // (LevelReader.java:33-34), but it is the only way to ask a generation region which chunks it
+    // can serve (WorldGenRegion.java:162-165); getChunk throws a ReportedException for the others.
+    // deprecated-api: no replacement tells a generation region's served chunks from the rest.
+    @SuppressWarnings("deprecation")
     public static List<BoundingBox> around(LevelReader level, BlockPos origin) {
         int chunkX = SectionPos.blockToSectionCoord(origin.getX());
         int chunkZ = SectionPos.blockToSectionCoord(origin.getZ());
@@ -38,6 +43,12 @@ public final class EndIslandStructures {
         List<BoundingBox> boxes = new ArrayList<>();
         for (int dx = -distance; dx <= distance; dx++) {
             for (int dz = -distance; dz <= distance; dz++) {
+                // Vanilla's in_square placement keeps the origin in the decorated chunk, where
+                // every scanned chunk passes this check, but a datapack that offsets the island
+                // into a neighbouring chunk reaches the region's edge.
+                if (!level.hasChunk(chunkX + dx, chunkZ + dz)) {
+                    continue;
+                }
                 ChunkAccess chunk =
                         level.getChunk(
                                 chunkX + dx, chunkZ + dz, ChunkStatus.STRUCTURE_STARTS, false);

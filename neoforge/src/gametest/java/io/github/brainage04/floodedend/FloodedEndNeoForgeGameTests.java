@@ -46,4 +46,8 @@ public final class FloodedEndNeoForgeGameTests {
     public void shippedEndSettingsFollowVanilla(GameTestHelper helper) {
         FloodedEndGenerationAssertions.assertShippedEndSettingsFollowVanilla(helper);
     }
+
+    public void offsetIslandSkipsChunksTheRegionCannotServe(GameTestHelper helper) {
+        EndIslandRegionAssertions.offsetIslandSkipsChunksTheRegionCannotServe(helper);
+    }
 }

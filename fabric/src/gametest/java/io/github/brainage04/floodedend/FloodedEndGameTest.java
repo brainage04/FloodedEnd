@@ -58,4 +58,9 @@ public final class FloodedEndGameTest {
     public void shippedEndSettingsFollowVanilla(GameTestHelper helper) {
         FloodedEndGenerationAssertions.assertShippedEndSettingsFollowVanilla(helper);
     }
+
+    @GameTest
+    public void offsetIslandSkipsChunksTheRegionCannotServe(GameTestHelper helper) {
+        EndIslandRegionAssertions.offsetIslandSkipsChunksTheRegionCannotServe(helper);
+    }
 }
