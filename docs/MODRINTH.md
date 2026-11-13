@@ -139,6 +139,12 @@ Side support is inferred from `fabric.mod.json`:
 
 You can still override the inferred values in `.modrinth/project.json` if needed.
 
+FloodedEnd sets `client_side` to `optional` there. `fabric.mod.json` declares `environment` `*` and no client
+entrypoint, which the rule above reads as `client_side=unsupported`, but singleplayer runs the world in an integrated
+server: a player needs FloodedEnd on the client to play a flooded End in singleplayer, and installing it on a client
+that joins a server stays optional. CurseForge gets the same answer from `build.gradle`, which sets
+`modPublishing.curseforge.client` to true for every project the publishing plugin is applied to.
+
 ## Release notes
 
 The Modrinth changelog is taken from the same annotated tag notes that are used for the GitHub release body. See [RELEASE.md](RELEASE.md) for more info.

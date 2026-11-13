@@ -1,4 +1,6 @@
 {
+  "client_side": "optional",
+  "server_side": "required",
   "categories": [
     "worldgen"
   ],

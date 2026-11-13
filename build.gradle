@@ -3,6 +3,15 @@ plugins {
 }
 
 multiLoaderModConventions {
-	// FloodedEnd is server-only and has no client GameTest entrypoint.
+	// FloodedEnd has no client entrypoint, renderer or client fixture, so it has no client GameTests.
 	fabricClientGameTests = false
+}
+
+// mod_side=server keeps the server-only build layout, which makes MinecraftModConventions list the mod as server-only
+// on CurseForge. Singleplayer runs an integrated server, so a client needs FloodedEnd installed to play a flooded End;
+// installing it on a client that joins a server stays optional.
+subprojects {
+	pluginManager.withPlugin('io.github.brainage04.mod-publishing') {
+		modPublishing.curseforge.client = true
+	}
 }
