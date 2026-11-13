@@ -5,12 +5,16 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.JsonOps;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -20,21 +24,30 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.permissions.PermissionLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.densityfunction.SamplerContext;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityPieces;
 import net.minecraft.world.level.levelgen.structure.structures.EndCityStructure;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
 public final class FloodedEndBehaviorAssertions {
     /** The seed of the world {@code docs/THE_END_UNDER_WATER.md} was measured in. */
@@ -75,7 +88,8 @@ public final class FloodedEndBehaviorAssertions {
                     "a dimension that does not generate from the End's settings has no End ocean");
             helper.assertTrue(
                     feedback.contains(
-                            "minecraft:overworld does not generate from the minecraft:end noise settings"),
+                            "minecraft:overworld does not generate from the minecraft:end noise"
+                                    + " settings"),
                     "status names the dimension it rejects");
             helper.assertValueEqual(command(source, "preset list"), 2, "both presets are listed");
             helper.assertTrue(
@@ -130,7 +144,8 @@ public final class FloodedEndBehaviorAssertions {
                     command(source, "probe 512 512"), 1, "explicit probe coordinates work");
             helper.assertTrue(
                     feedback.contains(
-                            "minecraft:the_end column (512, 512): surface minecraft:water at y=57; water 58 blocks from y=0 to y=57"),
+                            "minecraft:the_end column (512, 512): surface minecraft:water at y=57;"
+                                    + " water 58 blocks from y=0 to y=57"),
                     "probe describes real blocks");
             helper.assertValueEqual(
                     command(elsewhere, "probe"),
@@ -187,8 +202,8 @@ public final class FloodedEndBehaviorAssertions {
             int max = ground.getLast();
             int portal = groundY(generator, end, randomState, 0, 0);
             FloodedEnd.LOGGER.info(
-                    "FloodedEnd main island ground within 40 blocks of the exit portal, seed {}: "
-                            + "min {}, median {}, max {}; ground at the portal {}; water surface {}",
+                    "FloodedEnd main island ground within 40 blocks of the exit portal, seed {}:"
+                            + " min {}, median {}, max {}; ground at the portal {}; water surface {}",
                     seed,
                     min,
                     median,
@@ -404,7 +419,8 @@ public final class FloodedEndBehaviorAssertions {
                                         end.getChunkSource().randomState());
                         helper.assertTrue(
                                 ground <= 52,
-                                "every hull column clears the real seabed, including between old grid samples");
+                                "every hull column clears the real seabed, including between old"
+                                        + " grid samples");
                     }
                 }
             }
@@ -502,6 +518,136 @@ public final class FloodedEndBehaviorAssertions {
         }
         helper.assertTrue(ships > 0, "the deterministic city samples include ships");
         helper.succeed();
+    }
+
+    /**
+     * Vanilla's small End island writes every block of its blob without asking ({@code
+     * EndIslandFeature.java:27}), so one that grows across a chunk border after that neighbour
+     * placed its structures replaces parts of a moored ship's hull with end stone. FloodedEnd keeps
+     * the island out of every structure piece around its chunk. This test puts vanilla's own ship
+     * template in the End, registers it as a structure start of that chunk the way a generated
+     * city's ship is, grows vanilla's island feature over it and compares every block of the hull's
+     * box with the state it had before the island.
+     */
+    public static void assertSmallEndIslandsKeepOutOfShips(GameTestHelper helper) {
+        ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
+        RegistryAccess access = end.registryAccess();
+        Structure city =
+                access.lookupOrThrow(Registries.STRUCTURE)
+                        .getOrThrow(
+                                ResourceKey.create(
+                                        Registries.STRUCTURE,
+                                        Identifier.withDefaultNamespace("end_city")))
+                        .value();
+        Feature island =
+                access.lookupOrThrow(Registries.FEATURE)
+                        .getOrThrow(
+                                ResourceKey.create(
+                                        Registries.FEATURE,
+                                        Identifier.withDefaultNamespace("end_island")))
+                        .value();
+        StructureTemplateManager templates = end.getStructureTemplateManager();
+        StructureTemplate ship =
+                templates.getOrCreate(Identifier.withDefaultNamespace("end_city/ship"));
+        StructurePlaceSettings settings = new StructurePlaceSettings().setIgnoreEntities(true);
+        // Far above the End's terrain and clear of the GameTest structures.
+        BlockPos position = new BlockPos(20000, 150, 20000);
+        ChunkPos chunkPos =
+                new ChunkPos(
+                        SectionPos.blockToSectionCoord(position.getX()),
+                        SectionPos.blockToSectionCoord(position.getZ()));
+        ChunkAccess chunk = end.getChunk(chunkPos.x(), chunkPos.z());
+        Map<Structure, StructureStart> previousStarts = new HashMap<>(chunk.getAllStarts());
+        var piece =
+                new EndCityPieces.EndCityPiece(templates, "ship", position, Rotation.NONE, true);
+        BoundingBox hull = piece.getBoundingBox();
+        // At the hull's edge, so part of the island lands outside the ship and part inside it.
+        BlockPos islandOrigin =
+                new BlockPos(hull.minX() + 2, hull.minY() + 4, hull.getCenter().getZ());
+        try {
+            ship.placeInWorld(end, position, position, settings, RandomSource.create(1), 2);
+            chunk.setStartForStructure(
+                    city,
+                    new StructureStart(city, chunkPos, 0, new PiecesContainer(List.of(piece))));
+            List<BlockState> hullBefore = hullStates(end, hull);
+            int hullBlocks = 0;
+            for (BlockState state : hullBefore) {
+                if (!state.isAir()) {
+                    hullBlocks++;
+                }
+            }
+            helper.assertTrue(
+                    hullBlocks > 500, "the ship template is in the world before the island runs");
+            int endStoneBefore = endStoneOutside(end, islandOrigin, hull);
+
+            island.place(
+                    end, end.getChunkSource().getGenerator(), RandomSource.create(2), islandOrigin);
+
+            List<BlockState> hullAfter = hullStates(end, hull);
+            List<String> changed = new ArrayList<>();
+            for (int i = 0; i < hullBefore.size(); i++) {
+                if (!hullBefore.get(i).equals(hullAfter.get(i))) {
+                    changed.add(hullBefore.get(i) + " became " + hullAfter.get(i));
+                }
+            }
+            helper.assertTrue(
+                    changed.isEmpty(),
+                    "the island places no block inside the ship, but "
+                            + changed.size()
+                            + " did change: "
+                            + changed.stream().limit(5).toList());
+            helper.assertTrue(
+                    endStoneOutside(end, islandOrigin, hull) > endStoneBefore,
+                    "the island still places its end stone outside the ship");
+        } finally {
+            clear(end, hull.inflatedBy(14));
+            chunk.setAllStarts(previousStarts);
+        }
+        helper.succeed();
+    }
+
+    private static List<BlockState> hullStates(ServerLevel level, BoundingBox box) {
+        List<BlockState> states = new ArrayList<>();
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        for (int y = box.minY(); y <= box.maxY(); y++) {
+            for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                for (int x = box.minX(); x <= box.maxX(); x++) {
+                    states.add(level.getBlockState(cursor.set(x, y, z)));
+                }
+            }
+        }
+        return states;
+    }
+
+    /**
+     * End stone in the island's blob outside the ship, so the test fails if the island stops
+     * placing blocks at all instead of only inside the ship.
+     */
+    private static int endStoneOutside(ServerLevel level, BlockPos islandOrigin, BoundingBox hull) {
+        int endStone = 0;
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        for (int y = islandOrigin.getY() - 12; y <= islandOrigin.getY(); y++) {
+            for (int z = islandOrigin.getZ() - 8; z <= islandOrigin.getZ() + 8; z++) {
+                for (int x = islandOrigin.getX() - 8; x <= islandOrigin.getX() + 8; x++) {
+                    BlockPos pos = cursor.set(x, y, z);
+                    if (!hull.isInside(pos) && level.getBlockState(pos).is(Blocks.END_STONE)) {
+                        endStone++;
+                    }
+                }
+            }
+        }
+        return endStone;
+    }
+
+    private static void clear(ServerLevel level, BoundingBox box) {
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        for (int y = box.minY(); y <= box.maxY(); y++) {
+            for (int z = box.minZ(); z <= box.maxZ(); z++) {
+                for (int x = box.minX(); x <= box.maxX(); x++) {
+                    level.setBlock(cursor.set(x, y, z), Blocks.AIR.defaultBlockState(), 2);
+                }
+            }
+        }
     }
 
     private static Structure.GenerationContext cityContext(

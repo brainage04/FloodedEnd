@@ -27,6 +27,11 @@ FloodedEnd generates `minecraft:end_city` itself (`floodedend:end_city`) and ask
 for the ground beneath the water. The city uses vanilla's templates; FloodedEnd tries to lower each ship onto the
 sea, leaving it in the sky if no suitable mooring is found nearby.
 
+Vanilla's small End islands would grow through a moored ship: an island is a feature, so it writes after the chunks
+generated before it had their structures placed, and vanilla's island replaces every block of its blob. FloodedEnd
+keeps an island out of every structure piece around its chunk, so an island that reaches a moored ship stops at its
+hull and the ship stays whole.
+
 The sea level, the fluid and the heightmaps are all read back out of the running chunk generator, so a world using
 a different preset moors its ships at that world's waterline, and a dry End keeps vanilla's ship placement exactly.
 
@@ -104,12 +109,10 @@ file, the one loaded last wins.
 
 ## Known issues
 
-- A small End island that vanilla generates next to a moored ship, between y=55 and y=70, can replace part of the
-  ship's hull with end stone.
 - One world generated on Minecraft 26.2 has a lone bow of an End ship standing in the sea at (-1728, 54, 45). Its
   cause is unknown.
 
-Both are described in the [Underwater End notes](docs/THE_END_UNDER_WATER.md#known-ship-defects).
+It is described in the [Underwater End notes](docs/THE_END_UNDER_WATER.md#a-lone-bow-in-a-262-world).
 
 ## Documentation
 

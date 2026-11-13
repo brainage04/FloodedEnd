@@ -35,6 +35,11 @@ public final class FloodedEndGameTest {
     }
 
     @GameTest
+    public void smallEndIslandsKeepOutOfShips(GameTestHelper helper) {
+        FloodedEndBehaviorAssertions.assertSmallEndIslandsKeepOutOfShips(helper);
+    }
+
+    @GameTest
     public void stalePresetIsUpgradedBeforeLoading(GameTestHelper helper) {
         FloodedEndAssertions.assertStalePresetIsUpgradedBeforeLoading(helper);
     }

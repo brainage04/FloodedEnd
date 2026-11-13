@@ -99,19 +99,29 @@ placement chunk's eight-chunk neighbourhood.
 ever needs – the ships of a watched world moved between 1 and 14 blocks to find water – and it keeps a moored ship
 close to the city it belongs to.
 
-## Known ship defects
+## Ship defects
 
 ### Small End islands in a hull
 
 The `small_end_islands` biome places `minecraft:end_island_decorated`, small islands of end stone between y=55 and
 y=70, in the first generation step. They are features, so the terrain height that the mooring reads does not include
-them. An island placed from a neighbouring chunk after the ship's own chunk was decorated replaces hull blocks with
-end stone, and which of the two chunks is decorated first changes from run to run.
+them. Vanilla's island writes every block of its blob without asking, and a chunk's features may write one chunk
+around their own, while a chunk places its structures before its own features but after the features of the chunks
+generated before it. An island placed from a neighbouring chunk after the ship's own chunk was decorated therefore
+replaced hull blocks with end stone, and which of the two chunks was decorated first changed from run to run.
 
 A diagnostic GameTest switched structure generation on in the GameTest world (seed 0), generated the chunks under five
 moored ships and compared 898 hull blocks of each with the ship template. Over three runs, three ships were whole every
 time, one lost 2, 2 and 0 blocks, and one lost 37, 37 and 50. Four of the five hulls lie over `small_end_islands`,
 so keeping ships away from that biome would leave most of them in the sky.
+
+FloodedEnd now keeps the island out of every structure piece around its own chunk: the island reads the pieces of the
+structure starts within `ChunkStatus.MAX_STRUCTURE_DISTANCE` chunks, the same bound that keeps a moored ship inside its
+city's neighbourhood, and skips a block that lies inside one of them. The island keeps growing outside the pieces, so
+an island next to a ship stands against its hull instead of replacing it. The GameTest
+`small_end_islands_keep_out_of_ships` puts vanilla's ship template in the End, registers it as a structure start of
+that chunk the way a generated city's ship is, grows vanilla's island feature over it and checks that no block of the
+ship changed.
 
 ### A lone bow in a 26.2 world
 

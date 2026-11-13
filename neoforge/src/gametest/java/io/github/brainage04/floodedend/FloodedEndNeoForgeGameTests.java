@@ -27,6 +27,10 @@ public final class FloodedEndNeoForgeGameTests {
         FloodedEndBehaviorAssertions.assertCityGenerationPreservesDryVanilla(helper);
     }
 
+    public void smallEndIslandsKeepOutOfShips(GameTestHelper helper) {
+        FloodedEndBehaviorAssertions.assertSmallEndIslandsKeepOutOfShips(helper);
+    }
+
     public void stalePresetIsUpgradedBeforeLoading(GameTestHelper helper) {
         FloodedEndAssertions.assertStalePresetIsUpgradedBeforeLoading(helper);
     }

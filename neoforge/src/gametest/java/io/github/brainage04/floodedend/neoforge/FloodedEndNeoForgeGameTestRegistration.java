@@ -40,6 +40,10 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 () -> tests::cityGenerationPreservesDryVanilla);
         event.register(
                 BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("small_end_islands_keep_out_of_ships"),
+                () -> tests::smallEndIslandsKeepOutOfShips);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
                 FloodedEnd.of("stale_preset_is_upgraded_before_loading"),
                 () -> tests::stalePresetIsUpgradedBeforeLoading);
         event.register(
