@@ -11,8 +11,8 @@ dependencies {
 }
 
 configurations.named('testRuntimeClasspath') {
-	// With fabric-loader-junit on the test classpath, Gradle discovered none of DimensionStructureVariants'
-	// jqwik properties (dsv-r1-unit, 14 Nov). The unit tests need no Fabric loader.
+	// With fabric-loader-junit 0.19.5 on the test classpath, :fabric:test discovered none of these jqwik
+	// properties and failed (CI run 43602691469, 15 Nov). The unit tests need no Fabric loader.
 	exclude group: 'net.fabricmc', module: 'fabric-loader-junit'
 }
 
