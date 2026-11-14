@@ -64,7 +64,8 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 () -> tests::offsetIslandSkipsChunksTheRegionCannotServe);
         event.register(
                 BuiltInRegistries.TEST_FUNCTION.key(),
-                FloodedEnd.of("offset_island_keeps_out_of_chunk_whose_start_the_region_cannot_serve"),
+                FloodedEnd.of(
+                        "offset_island_keeps_out_of_chunk_whose_start_the_region_cannot_serve"),
                 () -> tests::offsetIslandKeepsOutOfChunkWhoseStartTheRegionCannotServe);
     }
 }
