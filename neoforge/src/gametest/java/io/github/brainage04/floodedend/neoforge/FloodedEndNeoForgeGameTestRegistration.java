@@ -40,6 +40,10 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 () -> tests::cityGenerationPreservesDryVanilla);
         event.register(
                 BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("island_keeps_out_of_chunk_whose_start_is_beyond_the_scan"),
+                () -> tests::islandKeepsOutOfChunkWhoseStartIsBeyondTheScan);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
                 FloodedEnd.of("small_end_islands_keep_out_of_ships"),
                 () -> tests::smallEndIslandsKeepOutOfShips);
         event.register(
