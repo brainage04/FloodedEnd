@@ -44,6 +44,10 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 () -> tests::smallEndIslandsKeepOutOfShips);
         event.register(
                 BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("gateway_island_keeps_ship_whose_start_is_in_neighbour"),
+                () -> tests::gatewayIslandKeepsShipWhoseStartIsInNeighbour);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
                 FloodedEnd.of("stale_preset_is_upgraded_before_loading"),
                 () -> tests::stalePresetIsUpgradedBeforeLoading);
         event.register(

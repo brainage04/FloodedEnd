@@ -130,9 +130,10 @@ nine chunks from the island's own chunk: the island then leaves that chunk alone
 holds a reference to every start whose box reaches into it (`ChunkGenerator.java:633-650`) and this one names a
 start the scan cannot see. The island also reads the starts of every chunk the level holds, not only of full
 chunks: a gateway's exit island is placed through the server level (`TheEndGatewayBlockEntity.java:156-165`),
-where the chunks around the exit are held below a full chunk. No GameTest covers that case: a start cannot be
-kept in a chunk below a full chunk in the GameTest world, because the level's ticket for such a chunk expires
-(`TicketType.java:24`, `TicketStorage.java:279-286`).
+where the chunks around the exit are held below a full chunk. `gateway_island_keeps_ship_whose_start_is_in_neighbour`
+places the island that way, with the exit chunk held as a full chunk, the ship in it and the ship's start two chunks
+farther west, in a chunk the level holds below a full chunk and that neither the ship nor the island reaches: the
+server level has to read that chunk's starts, where a generation region would have refused a chunk it cannot serve.
 
 ### A lone bow in a 26.2 world
 

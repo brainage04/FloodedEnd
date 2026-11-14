@@ -40,6 +40,11 @@ public final class FloodedEndGameTest {
     }
 
     @GameTest
+    public void gatewayIslandKeepsShipWhoseStartIsInNeighbour(GameTestHelper helper) {
+        FloodedEndBehaviorAssertions.assertGatewayIslandKeepsShipWhoseStartIsInNeighbour(helper);
+    }
+
+    @GameTest
     public void islandKeepsOutOfChunkWhoseStartIsBeyondTheScan(GameTestHelper helper) {
         FloodedEndBehaviorAssertions.assertIslandKeepsOutOfChunkWhoseStartIsBeyondTheScan(helper);
     }
