@@ -57,11 +57,6 @@ public final class EndIslandStructures {
      * EndShipMooring} keeps a moored ship inside, plus the chunks in the island's reach that hold a
      * structure start this scan could not read.
      */
-    // hasChunk is deprecated with the rest of LevelReader's presence checks
-    // (LevelReader.java:33-34), but it is the only way to ask a generation region which chunks it
-    // can serve (WorldGenRegion.java:162-165); getChunk throws a ReportedException for the others.
-    // deprecated-api: no replacement tells a generation region's served chunks from the rest.
-    @SuppressWarnings("deprecation")
     public static KeepOut keepOut(LevelReader level, BlockPos origin) {
         int chunkX = SectionPos.blockToSectionCoord(origin.getX());
         int chunkZ = SectionPos.blockToSectionCoord(origin.getZ());
@@ -73,8 +68,7 @@ public final class EndIslandStructures {
                 // the chunks a generation region serves, and asking for one of those throws. Every
                 // other level answers with null for a chunk it does not hold, and the structure
                 // references it holds for the others, so the level itself keeps the scan honest.
-                if (level instanceof WorldGenRegion region
-                        && !region.hasChunk(chunkX + dx, chunkZ + dz)) {
+                if (regionCannotServe(level, chunkX + dx, chunkZ + dz)) {
                     continue;
                 }
 
@@ -101,7 +95,8 @@ public final class EndIslandStructures {
     }
 
     /**
-     * The chunks within the island's reach that hold a structure start the scan could not read.
+     * The chunks within the island's reach that hold a structure start the scan could not read: one
+     * farther than the scan's distance, or one the generation region could not serve.
      *
      * <p>Vanilla stores in a chunk a reference to every structure start whose box reaches it
      * ({@code ChunkGenerator.java:633-650}), a chunk places the pieces of the starts it references
@@ -125,7 +120,7 @@ public final class EndIslandStructures {
                     continue;
                 }
 
-                if (referencesAStartBeyond(chunk, chunkX, chunkZ, distance)) {
+                if (referencesAStartBeyond(level, chunk, chunkX, chunkZ, distance)) {
                     beyondTheScan.add(chunk.getPos());
                 }
             }
@@ -135,16 +130,28 @@ public final class EndIslandStructures {
     }
 
     private static boolean referencesAStartBeyond(
-            ChunkAccess chunk, int chunkX, int chunkZ, int distance) {
+            LevelReader level, ChunkAccess chunk, int chunkX, int chunkZ, int distance) {
         for (LongSet starts : chunk.getAllReferences().values()) {
             for (long start : starts) {
-                if (Math.abs(ChunkPos.getX(start) - chunkX) > distance
-                        || Math.abs(ChunkPos.getZ(start) - chunkZ) > distance) {
+                int startX = ChunkPos.getX(start);
+                int startZ = ChunkPos.getZ(start);
+                if (Math.abs(startX - chunkX) > distance
+                        || Math.abs(startZ - chunkZ) > distance
+                        || regionCannotServe(level, startX, startZ)) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    // hasChunk is deprecated with the rest of LevelReader's presence checks
+    // (LevelReader.java:33-34), but it is the only way to ask a generation region which chunks it
+    // can serve (WorldGenRegion.java:162-165); getChunk throws a ReportedException for the others.
+    // deprecated-api: no replacement tells a generation region's served chunks from the rest.
+    @SuppressWarnings("deprecation")
+    private static boolean regionCannotServe(LevelReader level, int chunkX, int chunkZ) {
+        return level instanceof WorldGenRegion region && !region.hasChunk(chunkX, chunkZ);
     }
 }

@@ -68,4 +68,9 @@ public final class FloodedEndGameTest {
     public void offsetIslandSkipsChunksTheRegionCannotServe(GameTestHelper helper) {
         EndIslandRegionAssertions.offsetIslandSkipsChunksTheRegionCannotServe(helper);
     }
+
+    @GameTest
+    public void offsetIslandKeepsOutOfChunkWhoseStartTheRegionCannotServe(GameTestHelper helper) {
+        EndIslandRegionAssertions.offsetIslandKeepsOutOfChunkWhoseStartTheRegionCannotServe(helper);
+    }
 }

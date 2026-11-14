@@ -54,4 +54,8 @@ public final class FloodedEndNeoForgeGameTests {
     public void offsetIslandSkipsChunksTheRegionCannotServe(GameTestHelper helper) {
         EndIslandRegionAssertions.offsetIslandSkipsChunksTheRegionCannotServe(helper);
     }
+
+    public void offsetIslandKeepsOutOfChunkWhoseStartTheRegionCannotServe(GameTestHelper helper) {
+        EndIslandRegionAssertions.offsetIslandKeepsOutOfChunkWhoseStartTheRegionCannotServe(helper);
+    }
 }
