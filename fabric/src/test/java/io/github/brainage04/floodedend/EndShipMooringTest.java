@@ -3,6 +3,7 @@ package io.github.brainage04.floodedend;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import it.unimi.dsi.fastutil.HashCommon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -98,6 +99,36 @@ class EndShipMooringTest {
         assertEquals(WorldgenFixtures.END.getMaxY(), area.maxY());
     }
 
+    /** A hull is inside the area exactly when vanilla's box holds both of its corners. */
+    @Property(tries = 3000)
+    void aHullIsInsideTheAreaWhenTheAreaHoldsBothItsCorners(
+            @ForAll @IntRange(min = -1000, max = 1000) int chunkX,
+            @ForAll @IntRange(min = -1000, max = 1000) int chunkZ,
+            @ForAll @Size(6) List<@IntRange(min = -2, max = 2) Integer> nearEdges,
+            @ForAll @Size(6) List<Boolean> fromMin) {
+        BoundingBox area =
+                EndShipMooring.placeableArea(new ChunkPos(chunkX, chunkZ), WorldgenFixtures.END);
+        int[] mins = {area.minX(), area.minY(), area.minZ()};
+        int[] maxs = {area.maxX(), area.maxY(), area.maxZ()};
+        int[] corner = new int[6];
+        for (int i = 0; i < 6; i++) {
+            int axis = i % 3;
+            corner[i] = (fromMin.get(i) ? mins[axis] : maxs[axis]) + nearEdges.get(i);
+        }
+        BoundingBox hull =
+                new BoundingBox(
+                        Math.min(corner[0], corner[3]),
+                        Math.min(corner[1], corner[4]),
+                        Math.min(corner[2], corner[5]),
+                        Math.max(corner[0], corner[3]),
+                        Math.max(corner[1], corner[4]),
+                        Math.max(corner[2], corner[5]));
+        assertEquals(
+                area.isInside(hull.minX(), hull.minY(), hull.minZ())
+                        && area.isInside(hull.maxX(), hull.maxY(), hull.maxZ()),
+                EndShipMooring.inside(area, hull));
+    }
+
     /**
      * Over made-up sea floors, the mooring is the first candidate where the hull floats clear of
      * the floor and stays in the placeable area, in the order the search promises: the ship's own
@@ -117,9 +148,8 @@ class EndShipMooringTest {
             @ForAll @IntRange(min = 0, max = 29) int anchorX,
             @ForAll @IntRange(min = 0, max = 29) int anchorZ,
             @ForAll @IntRange(min = 10, max = 240) int keelY,
-            @ForAll @IntRange(min = 0, max = 200) int floor,
-            @ForAll @Size(max = 6)
-                    List<@IntRange(min = 0, max = Integer.MAX_VALUE) Integer> shoals) {
+            @ForAll long terrainSeed,
+            @ForAll @IntRange(min = 0, max = 40) int shallowPercent) {
         ChunkPos chunk = new ChunkPos(chunkX, chunkZ);
         BlockPos origin =
                 new BlockPos(
@@ -134,7 +164,7 @@ class EndShipMooringTest {
                         minX + sizeX - 1,
                         originY + height - 1,
                         minZ + sizeZ - 1);
-        Seabed seabed = new Seabed(origin, floor, shoals);
+        Seabed seabed = new Seabed(origin, keelY, terrainSeed, shallowPercent);
         WorldgenFixtures.Terrain terrain = (x, z, heightmap) -> seabed.at(x, z);
 
         Optional<BlockPos> mooring =
@@ -172,20 +202,23 @@ class EndShipMooringTest {
         return Math.max(Math.abs(offset[0]), Math.abs(offset[1]));
     }
 
-    /** A flat floor with up to six raised rectangles near the ship. */
-    private record Seabed(BlockPos origin, int floor, List<Integer> shoals) {
+    /**
+     * A sea floor in cells of four by four blocks, each shallow enough to ground the ship with the
+     * given chance and otherwise deep enough to float it, by one block or more.
+     */
+    private record Seabed(BlockPos origin, int keelY, long seed, int shallowPercent) {
         int at(int x, int z) {
-            int height = floor;
-            for (int shoal : shoals) {
-                int minX = origin.getX() - 80 + (shoal & 0xFF) % 160;
-                int minZ = origin.getZ() - 80 + (shoal >>> 8 & 0xFF) % 160;
-                int width = 1 + (shoal >>> 16 & 0x3F);
-                int depth = 1 + (shoal >>> 22 & 0x3F);
-                if (x >= minX && x < minX + width && z >= minZ && z < minZ + depth) {
-                    height = Math.max(height, (shoal >>> 28) * 16);
-                }
-            }
-            return height;
+            long cell =
+                    HashCommon.mix(
+                            seed
+                                    ^ HashCommon.mix(
+                                            Math.floorDiv(x - origin.getX(), 4) * 1_000_003L
+                                                    + Math.floorDiv(z - origin.getZ(), 4)));
+            int roll = (int) Math.floorMod(cell, 100L);
+            int highestFloating = keelY - EndShipMooring.MOORING_CLEARANCE;
+            return roll < shallowPercent
+                    ? highestFloating + 1 + (int) Math.floorMod(cell >>> 8, 4L)
+                    : highestFloating - (int) Math.floorMod(cell >>> 16, 4L);
         }
 
         boolean clears(BoundingBox hull, int highest) {

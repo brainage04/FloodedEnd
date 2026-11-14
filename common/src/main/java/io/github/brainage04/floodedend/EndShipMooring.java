@@ -86,7 +86,7 @@ public final class EndShipMooring {
                 z + 15 + distance);
     }
 
-    private static boolean inside(BoundingBox area, BoundingBox box) {
+    static boolean inside(BoundingBox area, BoundingBox box) {
         return box.minX() >= area.minX()
                 && box.maxX() <= area.maxX()
                 && box.minY() >= area.minY()
