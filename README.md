@@ -7,8 +7,9 @@ is described as having had: `minecraft:end` now generates with **water** as its 
 sea level of 58**, so every basin, hollow and gap between the islands floods and the main island and the outer
 islands rise out of open water.
 
-Nothing is required on the client: the mod ships world generation data and a command, and the client renders plain
-vanilla water.
+A vanilla client needs nothing for a server that runs FloodedEnd: the mod ships world generation data and a command,
+and the client renders plain vanilla water. Singleplayer runs its world in an integrated server, so install
+FloodedEnd on the client as well to play a flooded End there.
 
 ## Features
 
@@ -55,8 +56,9 @@ loads after `datapacks/floodedend-preset` is deleted.
 
 - Minecraft 26.3, Java 25
 - Fabric Loader 0.19.5+ with Fabric API, or NeoForge 26.3.0.99+
-- Not needed on the client. Installed in a client, it floods the End chunks that every singleplayer world opened with
-  it generates, and those chunks keep their water after the mod is removed.
+- A server mod: a vanilla client needs nothing. Singleplayer runs the world in an integrated server, so install it on
+  the client there. Installed in a client, it floods the End chunks that every singleplayer world opened with it
+  generates, and those chunks keep their water after the mod is removed.
 
 ## Existing worlds
 
