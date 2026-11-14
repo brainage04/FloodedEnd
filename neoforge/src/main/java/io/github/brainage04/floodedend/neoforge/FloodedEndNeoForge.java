@@ -14,18 +14,18 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 @Mod(FloodedEnd.MOD_ID)
 public final class FloodedEndNeoForge {
-	private static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES =
-			DeferredRegister.create(Registries.STRUCTURE_TYPE, FloodedEnd.MOD_ID);
-	private static final DeferredHolder<StructureType<?>, StructureType<EndCityAtSea>> END_CITY =
-			STRUCTURE_TYPES.register(EndCityAtSea.NAME, () -> EndCityAtSea.TYPE);
+    private static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES =
+            DeferredRegister.create(Registries.STRUCTURE_TYPE, FloodedEnd.MOD_ID);
+    private static final DeferredHolder<StructureType<?>, StructureType<EndCityAtSea>> END_CITY =
+            STRUCTURE_TYPES.register(EndCityAtSea.NAME, () -> EndCityAtSea.TYPE);
 
-	public FloodedEndNeoForge(IEventBus modBus) {
-		FloodedEnd.initialize();
-		STRUCTURE_TYPES.register(modBus);
-		NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
-	}
+    public FloodedEndNeoForge(IEventBus modBus) {
+        FloodedEnd.initialize();
+        STRUCTURE_TYPES.register(modBus);
+        NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
+    }
 
-	private void onRegisterCommands(RegisterCommandsEvent event) {
-		FloodedEndCommand.register(event.getDispatcher());
-	}
+    private void onRegisterCommands(RegisterCommandsEvent event) {
+        FloodedEndCommand.register(event.getDispatcher());
+    }
 }

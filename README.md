@@ -30,6 +30,10 @@ sea, leaving it in the sky if no suitable mooring is found nearby.
 The sea level, the fluid and the heightmaps are all read back out of the running chunk generator, so a world using
 a different preset moors its ships at that world's waterline, and a dry End keeps vanilla's ship placement exactly.
 
+Only a dimension that generates from the `minecraft:end` noise settings gets these changes: the End, and data pack
+dimensions that reuse those settings. End cities in any other dimension, such as a Single Biome world set to an End
+biome, generate as in vanilla.
+
 ### Sea-level presets
 
 Minecraft decides the End's sea level from data packs when a world is loaded, so a preset is a data pack the mod
@@ -51,17 +55,40 @@ loads after `datapacks/floodedend-preset` is deleted.
 
 - Minecraft 26.3, Java 25
 - Fabric Loader 0.19.5+ with Fabric API, or NeoForge 26.3.0.99+
-- Server side only; installing it on the client changes nothing.
+- Not needed on the client. Installed in a client, it floods the End chunks that every singleplayer world opened with
+  it generates, and those chunks keep their water after the mod is removed.
+
+## Existing worlds
+
+FloodedEnd changes world generation, so it only affects End chunks generated while it is installed:
+
+- End chunks generated before it was installed stay dry. Where a new, flooded chunk meets an old one, the water
+  stands as a wall at the chunk border, because the End generates without aquifers and its water gets no fluid
+  updates. The wall flows into the dry chunk when a block next to it is updated.
+- End cities whose position was decided before it was installed keep their ships in the sky. Minecraft lays out
+  structures, ships included, about 11 chunks ahead of the chunks players have visited, and a city reaches up to 8
+  chunks from its centre. Ships in the sky can therefore also appear over newly flooded chunks up to about 300 blocks
+  beyond the End explored before the install.
+- Removing the mod leaves the water in every chunk generated while it was installed. Chunks generated afterwards
+  are dry again, unless a preset was applied with `/floodedend preset apply`. The preset data pack works without the
+  mod, so it keeps flooding new End chunks, and the End cities there get vanilla placement with their ships in the
+  sky. Run `/floodedend preset clear`, or delete `datapacks/floodedend-preset` from the world, before removing the
+  mod.
+
+For a fully flooded End, install it in a new world or in a world whose End has not been explored.
 
 ## Commands
 
 All commands require gamemaster permission (level 2).
 
-- `/floodedend status` - reports the End's live sea level and default fluid, and fails if the ocean is not active.
-- `/floodedend probe [x z]` - reads a loaded End column: its surface block, water depth and highest non-water block.
-- `/floodedend preset list` - lists the presets and the live ocean settings.
-- `/floodedend preset apply <moored|drowned>` - installs a sea-level preset for the next server start.
-- `/floodedend preset clear` - removes the installed preset for the next server start.
+- `/floodedend status [dimension]` – reports a dimension's live sea level and default fluid (the End by default), and
+  fails if it has no active ocean.
+- `/floodedend probe [x z [dimension]]` – reads a loaded column: its surface block, water depth and highest non-water
+  block. Without coordinates it reads where you stand. With coordinates it reads the End unless a dimension is given.
+- `/floodedend preset list` – lists the presets and the live ocean settings, and says whether the preset data pack is
+  installed, and whether `/datapack disable` turned it off.
+- `/floodedend preset apply <moored|drowned>` – installs a sea-level preset for the next server start.
+- `/floodedend preset clear` – removes the installed preset for the next server start.
 
 ## Configuration
 
@@ -71,10 +98,23 @@ Use the preset commands above. No configuration file or gamerules.
 
 Other data packs that replace `minecraft:end` noise settings or `minecraft:end_city` can override FloodedEnd's generation.
 
+FloodedEnd gives `minecraft:end_city` its own structure type, `floodedend:end_city`, so mods that change End cities
+through a mixin into vanilla's `EndCityStructure` no longer affect them. When two mods or data packs replace the same
+file, the one loaded last wins.
+
+## Known issues
+
+- A small End island that vanilla generates next to a moored ship, between y=55 and y=70, can replace part of the
+  ship's hull with end stone.
+- One world generated on Minecraft 26.2 has a lone bow of an End ship standing in the sea at (-1728, 54, 45). Its
+  cause is unknown.
+
+Both are described in the [Underwater End notes](docs/THE_END_UNDER_WATER.md#known-ship-defects).
+
 ## Documentation
 
-- [Underwater End notes](docs/THE_END_UNDER_WATER.md) - terrain measurements, ship placement and dragon fight observations.
-- [Development](docs/DEVELOPMENT.md) - building and GameTests.
+- [Underwater End notes](docs/THE_END_UNDER_WATER.md) – terrain measurements, ship placement and dragon fight observations.
+- [Development](docs/DEVELOPMENT.md) – building and GameTests.
 - [Release automation](docs/RELEASE.md)
 - [Modrinth publishing](docs/MODRINTH.md)
 
