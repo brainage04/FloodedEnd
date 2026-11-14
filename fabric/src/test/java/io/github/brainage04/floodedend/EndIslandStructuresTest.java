@@ -25,6 +25,8 @@ import net.jqwik.api.constraints.Size;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.RandomSource;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.StaticCache2D;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
@@ -240,6 +242,100 @@ class EndIslandStructuresTest {
         assertEquals(expectedBoxes, boxes);
         assertEquals(expectedAlone, new HashSet<>(keepOut.beyondTheScan()));
         assertEquals(expectedAlone.size(), keepOut.beyondTheScan().size());
+    }
+
+    /**
+     * In the generation region that decorates a chunk, an island whose origin a datapack moves up
+     * to one chunk away reads only the chunks the region serves, so it never asks for one the
+     * region would throw for ({@code WorldGenRegion.java:131-158}), and it still collects every
+     * piece of the served chunks within the structure distance and leaves alone every chunk around
+     * its own that references a start beyond that distance.
+     */
+    @Property(tries = 500)
+    void inAGenerationRegionTheScanReadsOnlyServedChunks(
+            @ForAll("worlds") List<FakeChunk> world,
+            @ForAll @IntRange(min = -1000, max = 1000) int centreX,
+            @ForAll @IntRange(min = -1000, max = 1000) int centreZ,
+            @ForAll @IntRange(min = -1, max = 1) int offsetX,
+            @ForAll @IntRange(min = -1, max = 1) int offsetZ,
+            @ForAll @IntRange(min = 0, max = 15) int inChunkX,
+            @ForAll @IntRange(min = 0, max = 15) int inChunkZ) {
+        ChunkPos centre = new ChunkPos(centreX, centreZ);
+        ChunkPos island = new ChunkPos(centreX + offsetX, centreZ + offsetZ);
+        int distance = ChunkStatus.MAX_STRUCTURE_DISTANCE;
+        int served = FEATURES.directDependencies().size() - 1;
+        Map<ChunkPos, ChunkAccess> chunks = new HashMap<>();
+        List<String> expectedBoxes = new ArrayList<>();
+        Set<ChunkPos> leftAloneAtLeast = new HashSet<>();
+        for (FakeChunk fake : world) {
+            ChunkPos pos = new ChunkPos(island.x() + fake.dx(), island.z() + fake.dz());
+            if (centre.getChessboardDistance(pos) > served) continue;
+            List<ChunkPos> references = new ArrayList<>();
+            for (ChunkPos reference : fake.references()) {
+                references.add(
+                        new ChunkPos(island.x() + reference.x(), island.z() + reference.z()));
+            }
+            List<List<BoundingBox>> starts = new ArrayList<>();
+            for (List<BoundingBox> start : fake.starts()) {
+                List<BoundingBox> moved = new ArrayList<>();
+                for (BoundingBox piece : start) {
+                    moved.add(piece.moved(pos.getMinBlockX(), 0, pos.getMinBlockZ()));
+                }
+                starts.add(moved);
+            }
+            chunks.put(pos, chunk(pos, fake.status(), starts, references));
+            if (island.getChessboardDistance(pos) <= distance) {
+                for (List<BoundingBox> start : starts) {
+                    for (BoundingBox piece : start) expectedBoxes.add(piece.toString());
+                }
+            }
+            if (island.getChessboardDistance(pos) <= 1
+                    && fake.status().isOrAfter(ChunkStatus.STRUCTURE_REFERENCES)
+                    && references.stream()
+                            .anyMatch(start -> island.getChessboardDistance(start) > distance)) {
+                leftAloneAtLeast.add(pos);
+            }
+        }
+        WorldGenRegion region = region(centre, chunks);
+
+        EndIslandStructures.KeepOut keepOut =
+                EndIslandStructures.keepOut(
+                        region,
+                        new BlockPos(island.getBlockX(inChunkX), 64, island.getBlockZ(inChunkZ)));
+
+        List<String> boxes = new ArrayList<>();
+        for (BoundingBox box : keepOut.boxes()) boxes.add(box.toString());
+        Collections.sort(boxes);
+        Collections.sort(expectedBoxes);
+        assertEquals(expectedBoxes, boxes);
+        assertTrue(
+                keepOut.beyondTheScan().containsAll(leftAloneAtLeast),
+                keepOut.beyondTheScan() + " misses some of " + leftAloneAtLeast);
+    }
+
+    /**
+     * The region the FEATURES step decorates {@code centre} through, as {@code WorldGenRegion}'s
+     * constructor builds it, holding {@code chunks} and empty chunks everywhere else it serves.
+     */
+    private static WorldGenRegion region(ChunkPos centre, Map<ChunkPos, ChunkAccess> chunks) {
+        StaticCache2D<ChunkAccess> cache =
+                StaticCache2D.create(
+                        centre.x(),
+                        centre.z(),
+                        FEATURES.directDependencies().size() - 1,
+                        (x, z) -> {
+                            ChunkPos pos = new ChunkPos(x, z);
+                            ChunkAccess chunk = chunks.get(pos);
+                            return chunk != null
+                                    ? chunk
+                                    : chunk(pos, ChunkStatus.FEATURES, List.of(), List.of());
+                        });
+        WorldGenRegion region = WorldgenFixtures.allocate(WorldGenRegion.class);
+        WorldgenFixtures.set(
+                WorldGenRegion.class, region, "center", cache.get(centre.x(), centre.z()));
+        WorldgenFixtures.set(WorldGenRegion.class, region, "generatingStep", FEATURES);
+        WorldgenFixtures.set(WorldGenRegion.class, region, "cache", cache);
+        return region;
     }
 
     /**
