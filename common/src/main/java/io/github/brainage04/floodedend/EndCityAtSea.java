@@ -62,7 +62,7 @@ public final class EndCityAtSea extends Structure {
      * difference is which heightmap is asked: the ocean floor once the End is flooded, the world
      * surface (vanilla's choice) when it is dry.
      */
-    private static int lowestGroundY(GenerationContext context, Rotation rotation, EndOcean ocean) {
+    static int lowestGroundY(GenerationContext context, Rotation rotation, EndOcean ocean) {
         int dx = 5;
         int dz = 5;
         if (rotation == Rotation.CLOCKWISE_90) {

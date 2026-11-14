@@ -6,6 +6,7 @@ import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -23,10 +24,10 @@ public final class EndShipMooring {
      * Measured moorings need 1 to 14 blocks; keeping the reach small also keeps a moored ship
      * inside the neighbourhood its city's structure was saved with.
      */
-    private static final int MOORING_REACH = 48;
+    static final int MOORING_REACH = 48;
 
-    private static final int MOORING_STEP = 8;
-    private static final int MOORING_CLEARANCE = 2;
+    static final int MOORING_STEP = 8;
+    static final int MOORING_CLEARANCE = 2;
 
     private EndShipMooring() {}
 
@@ -72,17 +73,16 @@ public final class EndShipMooring {
      * would be placed only as far as the radius reaches and would stand in the world half built. A
      * hull above the build height would be cut off the same way.
      */
-    private static BoundingBox placeableArea(Structure.GenerationContext context) {
-        ChunkPos chunk = context.chunkPos();
+    static BoundingBox placeableArea(ChunkPos chunk, LevelHeightAccessor heights) {
         int x = chunk.getMinBlockX();
         int z = chunk.getMinBlockZ();
         int distance = ChunkStatus.MAX_STRUCTURE_DISTANCE * 16;
         return new BoundingBox(
                 x - distance,
-                context.heightAccessor().getMinY(),
+                heights.getMinY(),
                 z - distance,
                 x + 15 + distance,
-                context.heightAccessor().getMaxY(),
+                heights.getMaxY(),
                 z + 15 + distance);
     }
 
@@ -95,11 +95,11 @@ public final class EndShipMooring {
                 && box.maxZ() <= area.maxZ();
     }
 
-    private static Optional<BlockPos> findMooring(
+    static Optional<BlockPos> findMooring(
             Structure.GenerationContext context, StructurePiece ship, int keelY) {
         BlockPos origin = ((TemplateStructurePiece) ship).templatePosition();
         BoundingBox hull = ship.getBoundingBox();
-        BoundingBox area = placeableArea(context);
+        BoundingBox area = placeableArea(context.chunkPos(), context.heightAccessor());
         Long2IntOpenHashMap seabed = new Long2IntOpenHashMap();
         seabed.defaultReturnValue(Integer.MIN_VALUE);
         for (int reach = 0; reach <= MOORING_REACH; reach += MOORING_STEP) {

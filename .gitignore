@@ -50,3 +50,6 @@ replay_*.log
 
 *.webm
 prompt.txt
+
+# jqwik
+.jqwik-database
