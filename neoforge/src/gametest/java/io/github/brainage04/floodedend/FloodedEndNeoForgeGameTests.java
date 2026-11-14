@@ -27,6 +27,14 @@ public final class FloodedEndNeoForgeGameTests {
         FloodedEndBehaviorAssertions.assertCityGenerationPreservesDryVanilla(helper);
     }
 
+    public void smallEndIslandsKeepOutOfShips(GameTestHelper helper) {
+        FloodedEndBehaviorAssertions.assertSmallEndIslandsKeepOutOfShips(helper);
+    }
+
+    public void islandKeepsOutOfChunkWhoseStartIsBeyondTheScan(GameTestHelper helper) {
+        FloodedEndBehaviorAssertions.assertIslandKeepsOutOfChunkWhoseStartIsBeyondTheScan(helper);
+    }
+
     public void stalePresetIsUpgradedBeforeLoading(GameTestHelper helper) {
         FloodedEndAssertions.assertStalePresetIsUpgradedBeforeLoading(helper);
     }
@@ -41,5 +49,9 @@ public final class FloodedEndNeoForgeGameTests {
 
     public void shippedEndSettingsFollowVanilla(GameTestHelper helper) {
         FloodedEndGenerationAssertions.assertShippedEndSettingsFollowVanilla(helper);
+    }
+
+    public void offsetIslandSkipsChunksTheRegionCannotServe(GameTestHelper helper) {
+        EndIslandRegionAssertions.offsetIslandSkipsChunksTheRegionCannotServe(helper);
     }
 }

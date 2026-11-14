@@ -40,6 +40,10 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 () -> tests::cityGenerationPreservesDryVanilla);
         event.register(
                 BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("small_end_islands_keep_out_of_ships"),
+                () -> tests::smallEndIslandsKeepOutOfShips);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
                 FloodedEnd.of("stale_preset_is_upgraded_before_loading"),
                 () -> tests::stalePresetIsUpgradedBeforeLoading);
         event.register(
@@ -54,5 +58,9 @@ public final class FloodedEndNeoForgeGameTestRegistration {
                 BuiltInRegistries.TEST_FUNCTION.key(),
                 FloodedEnd.of("shipped_end_settings_follow_vanilla"),
                 () -> tests::shippedEndSettingsFollowVanilla);
+        event.register(
+                BuiltInRegistries.TEST_FUNCTION.key(),
+                FloodedEnd.of("offset_island_skips_chunks_the_region_cannot_serve"),
+                () -> tests::offsetIslandSkipsChunksTheRegionCannotServe);
     }
 }

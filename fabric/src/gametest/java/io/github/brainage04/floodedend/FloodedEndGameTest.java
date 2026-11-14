@@ -35,6 +35,16 @@ public final class FloodedEndGameTest {
     }
 
     @GameTest
+    public void smallEndIslandsKeepOutOfShips(GameTestHelper helper) {
+        FloodedEndBehaviorAssertions.assertSmallEndIslandsKeepOutOfShips(helper);
+    }
+
+    @GameTest
+    public void islandKeepsOutOfChunkWhoseStartIsBeyondTheScan(GameTestHelper helper) {
+        FloodedEndBehaviorAssertions.assertIslandKeepsOutOfChunkWhoseStartIsBeyondTheScan(helper);
+    }
+
+    @GameTest
     public void stalePresetIsUpgradedBeforeLoading(GameTestHelper helper) {
         FloodedEndAssertions.assertStalePresetIsUpgradedBeforeLoading(helper);
     }
@@ -52,5 +62,10 @@ public final class FloodedEndGameTest {
     @GameTest
     public void shippedEndSettingsFollowVanilla(GameTestHelper helper) {
         FloodedEndGenerationAssertions.assertShippedEndSettingsFollowVanilla(helper);
+    }
+
+    @GameTest
+    public void offsetIslandSkipsChunksTheRegionCannotServe(GameTestHelper helper) {
+        EndIslandRegionAssertions.offsetIslandSkipsChunksTheRegionCannotServe(helper);
     }
 }
