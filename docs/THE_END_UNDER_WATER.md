@@ -124,15 +124,15 @@ piece, air included, so an island that overlaps an empty corner of a ship's box 
 chunk the way a generated city's ship is, grows vanilla's island feature over it and checks that no block of the ship
 changed.
 
-Three further cases are covered by their own GameTests. `gateway_island_keeps_ship_whose_start_is_in_neighbour` places
-the island through the server level the way an End gateway's exit island is placed
-(`TheEndGatewayBlockEntity.java:156-165`), with the ship in the exit chunk and its start in a neighbouring chunk the
-level holds below a full chunk: the server level has to read that neighbour's starts, where a generation region would
-have refused a chunk it cannot serve. `island_keeps_out_of_chunk_whose_start_is_beyond_the_scan` puts the ship in the
-chunk next to the island's, one chunk inside the island's write radius, and its start the whole structure distance
-farther, at nine chunks from the island's own chunk: the island then leaves that chunk alone entirely, because a chunk
-holds a reference to every start whose box reaches into it (`ChunkGenerator.java:633-650`) and this one names a start
-the scan cannot see.
+`island_keeps_out_of_chunk_whose_start_is_beyond_the_scan` puts the ship in the chunk next to the
+island's, one chunk inside the island's write radius, and its start the whole structure distance farther, at
+nine chunks from the island's own chunk: the island then leaves that chunk alone entirely, because a chunk
+holds a reference to every start whose box reaches into it (`ChunkGenerator.java:633-650`) and this one names a
+start the scan cannot see. The island also reads the starts of every chunk the level holds, not only of full
+chunks: a gateway's exit island is placed through the server level (`TheEndGatewayBlockEntity.java:156-165`),
+where the chunks around the exit are held below a full chunk. No GameTest covers that case: a start cannot be
+kept in a chunk below a full chunk in the GameTest world, because the level's ticket for such a chunk expires
+(`TicketType.java:24`, `TicketStorage.java:279-286`).
 
 ### A lone bow in a 26.2 world
 

@@ -22,8 +22,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.Ticket;
-import net.minecraft.server.level.TicketType;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.util.RandomSource;
@@ -593,100 +591,6 @@ public final class FloodedEndBehaviorAssertions {
         } finally {
             clear(end, hull.inflatedBy(14));
             chunk.setAllStarts(previousStarts);
-        }
-        helper.succeed();
-    }
-
-    /**
-     * A gateway's exit island is placed through the server level ({@code
-     * TheEndGatewayBlockEntity.java:156-165}), which keeps the chunks around the exit at the
-     * statuses their generation asked of them and not as full chunks. A ship's hull can stand in
-     * the exit chunk while the start that placed it sits in one of those neighbours, so the scan
-     * has to read the starts of a chunk below a full chunk all the same.
-     */
-    public static void assertGatewayIslandKeepsShipWhoseStartIsInNeighbour(GameTestHelper helper) {
-        ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
-        RegistryAccess access = end.registryAccess();
-        Structure city = cityStructure(access);
-        Feature island = islandFeature(access);
-        StructureTemplateManager templates = end.getStructureTemplateManager();
-        StructureTemplate ship =
-                templates.getOrCreate(Identifier.withDefaultNamespace("end_city/ship"));
-        StructurePlaceSettings settings = new StructurePlaceSettings().setIgnoreEntities(true);
-        // Far above the End's terrain and clear of the GameTest structures.
-        BlockPos position = new BlockPos(20000, 150, 20200);
-        ChunkPos chunkPos =
-                new ChunkPos(
-                        SectionPos.blockToSectionCoord(position.getX()),
-                        SectionPos.blockToSectionCoord(position.getZ()));
-        ChunkAccess chunk = end.getChunk(chunkPos.x(), chunkPos.z());
-        Map<Structure, StructureStart> previousStarts = new HashMap<>(chunk.getAllStarts());
-        var piece =
-                new EndCityPieces.EndCityPiece(templates, "ship", position, Rotation.NONE, true);
-        BoundingBox hull = piece.getBoundingBox();
-        // At the hull's edge, so part of the island lands outside the ship and part inside it.
-        BlockPos islandOrigin =
-                new BlockPos(hull.minX() + 2, hull.minY() + 4, hull.getCenter().getZ());
-        ChunkPos islandChunk =
-                new ChunkPos(
-                        SectionPos.blockToSectionCoord(islandOrigin.getX()),
-                        SectionPos.blockToSectionCoord(islandOrigin.getZ()));
-        // The level holds the exit chunk as a full chunk while the gateway places the island, and
-        // that ticket leaves the chunks around it at a lower status instead of full chunks. The
-        // gateway's own ticket expires, so the fixture holds the exit chunk itself.
-        end.getChunkSource().addTicket(new Ticket(TicketType.FORCED, 33), islandChunk);
-        // North of the exit chunk, where the ship does not reach and no full chunk stands.
-        ChunkPos startPos = new ChunkPos(islandChunk.x(), islandChunk.z() + 1);
-        ChunkAccess startChunk =
-                end.getChunkSource()
-                        .getChunk(startPos.x(), startPos.z(), ChunkStatus.STRUCTURE_STARTS, true);
-        Map<Structure, StructureStart> previousStartChunkStarts =
-                new HashMap<>(startChunk.getAllStarts());
-        try {
-            ship.placeInWorld(end, position, position, settings, RandomSource.create(1), 2);
-            startChunk.setStartForStructure(
-                    city,
-                    new StructureStart(city, startPos, 0, new PiecesContainer(List.of(piece))));
-            helper.assertTrue(
-                    startChunk.getPersistedStatus() != ChunkStatus.FULL,
-                    "the fixture holds the start's chunk below a full chunk, as a gateway's"
-                            + " neighbours are");
-            List<BlockState> hullBefore = hullStates(end, hull);
-            int hullBlocks = 0;
-            for (BlockState state : hullBefore) {
-                if (!state.isAir()) {
-                    hullBlocks++;
-                }
-            }
-            helper.assertTrue(
-                    hullBlocks > 500, "the ship template is in the world before the island runs");
-            int endStoneBefore = endStoneOutside(end, islandOrigin, hull);
-
-            island.place(
-                    end, end.getChunkSource().getGenerator(), RandomSource.create(2), islandOrigin);
-
-            List<BlockState> hullAfter = hullStates(end, hull);
-            List<String> changed = new ArrayList<>();
-            for (int i = 0; i < hullBefore.size(); i++) {
-                if (!hullBefore.get(i).equals(hullAfter.get(i))) {
-                    changed.add(hullBefore.get(i) + " became " + hullAfter.get(i));
-                }
-            }
-            helper.assertTrue(
-                    changed.isEmpty(),
-                    "the island places no block inside the ship whose start is in the neighbour,"
-                            + " but "
-                            + changed.size()
-                            + " did change: "
-                            + changed.stream().limit(5).toList());
-            helper.assertTrue(
-                    endStoneOutside(end, islandOrigin, hull) > endStoneBefore,
-                    "the island still places its end stone outside the ship");
-        } finally {
-            end.getChunkSource().removeTicketWithRadius(TicketType.FORCED, islandChunk, 0);
-            clear(end, hull.inflatedBy(14));
-            chunk.setAllStarts(previousStarts);
-            startChunk.setAllStarts(previousStartChunkStarts);
         }
         helper.succeed();
     }
