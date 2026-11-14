@@ -29,9 +29,12 @@ sea, leaving it in the sky if no suitable mooring is found nearby.
 
 Vanilla's small End islands would grow through a moored ship: an island is a feature, so it writes after the chunks
 generated before it had their structures placed, and vanilla's island replaces every block of its blob. FloodedEnd
-keeps an island out of every structure piece around its chunk, so an island that reaches a moored ship stops at the
-piece's bounding box and the ship stays whole. The skip follows that box, air included, not the hull alone, so an
-island that overlaps an empty corner of a ship's box is cut straight off there too.
+keeps an island out of every structure piece within `ChunkStatus.MAX_STRUCTURE_DISTANCE` chunks of its own chunk, so
+an island that reaches a moored ship stops at the piece's bounding box and the ship stays whole. The skip follows
+that box, air included, not the hull alone, so an island that overlaps an empty corner of a ship's box is cut
+straight off there too. An island may write one chunk around its own, and a chunk holds a reference to every start
+whose box reaches into it, so a chunk reaching for a start farther away than that neighbourhood gets no island blocks
+at all: a ship moored at the far end of its reach stays whole even though its city's start is out of the scan.
 
 The sea level, the fluid and the heightmaps are all read back out of the running chunk generator, so a world using
 a different preset moors its ships at that world's waterline, and a dry End keeps vanilla's ship placement exactly.

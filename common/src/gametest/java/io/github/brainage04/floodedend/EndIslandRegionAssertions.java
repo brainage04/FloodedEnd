@@ -1,6 +1,5 @@
 package io.github.brainage04.floodedend;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -18,7 +17,6 @@ import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkPyramid;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.chunk.status.ChunkStep;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 public final class EndIslandRegionAssertions {
     private EndIslandRegionAssertions() {}
@@ -48,9 +46,9 @@ public final class EndIslandRegionAssertions {
 
         // The origin of an island placed one chunk east of the decorated one.
         BlockPos origin = new BlockPos(center.getMinBlockX() + 24, level.getMinY() + 64, 8);
-        List<BoundingBox> boxes;
+        EndIslandStructures.KeepOut keepOut;
         try {
-            boxes = EndIslandStructures.around(region, origin);
+            keepOut = EndIslandStructures.keepOut(region, origin);
         } catch (RuntimeException | Error failure) {
             throw new AssertionError(
                     "An island origin one chunk off the region's centre must not ask the region"
@@ -59,8 +57,11 @@ public final class EndIslandRegionAssertions {
         }
 
         helper.assertTrue(
-                boxes.isEmpty(),
+                keepOut.boxes().isEmpty(),
                 "The fixture's chunks hold no structure starts, so the scan must find none");
+        helper.assertTrue(
+                keepOut.beyondTheScan().isEmpty(),
+                "The fixture's chunks hold no structure references, so none is left out");
         helper.succeed();
     }
 

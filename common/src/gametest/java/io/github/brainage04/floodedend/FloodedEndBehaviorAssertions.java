@@ -604,8 +604,7 @@ public final class FloodedEndBehaviorAssertions {
      * the exit chunk while the start that placed it sits in one of those neighbours, so the scan
      * has to read the starts of a chunk below a full chunk all the same.
      */
-    public static void assertGatewayIslandKeepsShipWhoseStartIsInNeighbour(
-            GameTestHelper helper) {
+    public static void assertGatewayIslandKeepsShipWhoseStartIsInNeighbour(GameTestHelper helper) {
         ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
         RegistryAccess access = end.registryAccess();
         Structure city = cityStructure(access);
@@ -684,8 +683,7 @@ public final class FloodedEndBehaviorAssertions {
                     endStoneOutside(end, islandOrigin, hull) > endStoneBefore,
                     "the island still places its end stone outside the ship");
         } finally {
-            end.getChunkSource()
-                    .removeTicketWithRadius(TicketType.FORCED, islandChunk, 0);
+            end.getChunkSource().removeTicketWithRadius(TicketType.FORCED, islandChunk, 0);
             clear(end, hull.inflatedBy(14));
             chunk.setAllStarts(previousStarts);
             startChunk.setAllStarts(previousStartChunkStarts);
@@ -700,8 +698,7 @@ public final class FloodedEndBehaviorAssertions {
      * city's start is one chunk farther from the island than the scan reaches ({@link
      * EndShipMooring}), so the island must leave that chunk to the structures it holds.
      */
-    public static void assertIslandKeepsOutOfChunkWhoseStartIsBeyondTheScan(
-            GameTestHelper helper) {
+    public static void assertIslandKeepsOutOfChunkWhoseStartIsBeyondTheScan(GameTestHelper helper) {
         ServerLevel end = helper.getLevel().getServer().getLevel(Level.END);
         RegistryAccess access = end.registryAccess();
         Structure city = cityStructure(access);

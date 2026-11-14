@@ -32,8 +32,7 @@ public final class FloodedEndNeoForgeGameTests {
     }
 
     public void gatewayIslandKeepsShipWhoseStartIsInNeighbour(GameTestHelper helper) {
-        FloodedEndBehaviorAssertions.assertGatewayIslandKeepsShipWhoseStartIsInNeighbour(
-                helper);
+        FloodedEndBehaviorAssertions.assertGatewayIslandKeepsShipWhoseStartIsInNeighbour(helper);
     }
 
     public void islandKeepsOutOfChunkWhoseStartIsBeyondTheScan(GameTestHelper helper) {

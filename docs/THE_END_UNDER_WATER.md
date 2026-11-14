@@ -115,14 +115,24 @@ moored ships and compared 898 hull blocks of each with the ship template. Over t
 time, one lost 2, 2 and 0 blocks, and one lost 37, 37 and 50. Four of the five hulls lie over `small_end_islands`,
 so keeping ships away from that biome would leave most of them in the sky.
 
-FloodedEnd now keeps the island out of every structure piece around its own chunk: the island reads the pieces of the
-structure starts within `ChunkStatus.MAX_STRUCTURE_DISTANCE` chunks, the same bound that keeps a moored ship inside its
-city's neighbourhood, and skips a block that lies inside one of them. The island keeps growing outside the boxes, so
-an island next to a ship stops at the piece's bounding box instead of replacing it. The box is the whole piece, air
-included, so an island that overlaps an empty corner of a ship's box is cut straight off there. The GameTest
-`small_end_islands_keep_out_of_ships` puts vanilla's ship template in the End, registers it as a structure start of
-that chunk the way a generated city's ship is, grows vanilla's island feature over it and checks that no block of the
-ship changed.
+FloodedEnd now keeps the island out of every structure piece within `ChunkStatus.MAX_STRUCTURE_DISTANCE` chunks of its
+own chunk: the island reads the pieces of the structure starts in that neighbourhood, the same bound that keeps a moored
+ship inside its city's neighbourhood, and skips a block that lies inside one of them. The island keeps growing outside
+the boxes, so an island next to a ship stops at the piece's bounding box instead of replacing it. The box is the whole
+piece, air included, so an island that overlaps an empty corner of a ship's box is cut straight off there. The GameTest
+`small_end_islands_keep_out_of_ships` puts vanilla's ship template in the End, registers it as a structure start of that
+chunk the way a generated city's ship is, grows vanilla's island feature over it and checks that no block of the ship
+changed.
+
+Three further cases are covered by their own GameTests. `gateway_island_keeps_ship_whose_start_is_in_neighbour` places
+the island through the server level the way an End gateway's exit island is placed
+(`TheEndGatewayBlockEntity.java:156-165`), with the ship in the exit chunk and its start in a neighbouring chunk the
+level holds below a full chunk: the server level has to read that neighbour's starts, where a generation region would
+have refused a chunk it cannot serve. `island_keeps_out_of_chunk_whose_start_is_beyond_the_scan` puts the ship in the
+chunk next to the island's, one chunk inside the island's write radius, and its start the whole structure distance
+farther, at nine chunks from the island's own chunk: the island then leaves that chunk alone entirely, because a chunk
+holds a reference to every start whose box reaches into it (`ChunkGenerator.java:633-650`) and this one names a start
+the scan cannot see.
 
 ### A lone bow in a 26.2 world
 
