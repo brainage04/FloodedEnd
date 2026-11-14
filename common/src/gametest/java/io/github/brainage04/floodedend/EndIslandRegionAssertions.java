@@ -56,8 +56,8 @@ public final class EndIslandRegionAssertions {
 
     /**
      * With the origin one chunk off the region's centre, a start eight chunks from the island's
-     * chunk can be nine from the centre, where the region cannot serve it, so the scan skips it.
-     * A chunk in the island's reach that references such a start must be left alone like one that
+     * chunk can be nine from the centre, where the region cannot serve it, so the scan skips it. A
+     * chunk in the island's reach that references such a start must be left alone like one that
      * references a start beyond the scan's distance.
      */
     // deprecated-api: hasChunk is the only way to ask a generation region which chunks it serves.

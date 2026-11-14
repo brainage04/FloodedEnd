@@ -95,8 +95,8 @@ public final class EndIslandStructures {
     }
 
     /**
-     * The chunks within the island's reach that hold a structure start the scan could not read:
-     * one farther than the scan's distance, or one the generation region could not serve.
+     * The chunks within the island's reach that hold a structure start the scan could not read: one
+     * farther than the scan's distance, or one the generation region could not serve.
      *
      * <p>Vanilla stores in a chunk a reference to every structure start whose box reaches it
      * ({@code ChunkGenerator.java:633-650}), a chunk places the pieces of the starts it references
