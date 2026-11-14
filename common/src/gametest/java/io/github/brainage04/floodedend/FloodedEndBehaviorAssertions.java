@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.JsonOps;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -617,6 +619,14 @@ public final class FloodedEndBehaviorAssertions {
         ChunkAccess writtenChunk = end.getChunk(written.x(), written.z());
         Map<Structure, StructureStart> previousWrittenStarts =
                 new HashMap<>(writtenChunk.getAllStarts());
+        // addReferenceForStructure adds to the chunk's own set, so the copy needs sets of its own.
+        Map<Structure, LongSet> previousWrittenReferences = new HashMap<>();
+        writtenChunk
+                .getAllReferences()
+                .forEach(
+                        (structure, starts) ->
+                                previousWrittenReferences.put(
+                                        structure, new LongOpenHashSet(starts)));
         var piece =
                 new EndCityPieces.EndCityPiece(templates, "ship", position, Rotation.NONE, true);
         BoundingBox hull = piece.getBoundingBox();
@@ -670,6 +680,7 @@ public final class FloodedEndBehaviorAssertions {
         } finally {
             clear(end, hull.inflatedBy(14));
             writtenChunk.setAllStarts(previousWrittenStarts);
+            writtenChunk.setAllReferences(previousWrittenReferences);
             startChunk.setAllStarts(previousStartChunkStarts);
         }
         helper.succeed();

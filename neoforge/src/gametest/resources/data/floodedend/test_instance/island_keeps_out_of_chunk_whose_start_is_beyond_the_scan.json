@@ -1,0 +1,7 @@
+{
+  "environment": "minecraft:default",
+  "structure": "minecraftmodconventions:empty",
+  "max_ticks": 100,
+  "type": "minecraft:function",
+  "function": "floodedend:island_keeps_out_of_chunk_whose_start_is_beyond_the_scan"
+}
