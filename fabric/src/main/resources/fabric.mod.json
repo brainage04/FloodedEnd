@@ -9,7 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://github.com/brainage04/FloodedEnd",
-		"sources": "https://github.com/brainage04/FloodedEnd"
+		"sources": "https://github.com/brainage04/FloodedEnd",
+		"issues": "https://github.com/brainage04/FloodedEnd/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/floodedend/icon.png",
